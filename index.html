@@ -71,6 +71,22 @@ body {
   margin-bottom: 12px; outline: none; transition: border 0.2s;
 }
 .login-card input:focus { border-color: var(--verde); }
+.login-pass-wrap { position: relative; }
+.login-pass-wrap input { padding-right: 42px; }
+.login-eye {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer; padding: 4px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--gray-400); margin-bottom: 0;
+}
+.login-eye:hover { color: var(--verde-dark); }
+.login-eye svg { width: 18px; height: 18px; }
+.login-remember {
+  display: flex; align-items: center; gap: 6px;
+  text-align: left; font-size: 13px; color: var(--gray-400);
+  margin-bottom: 16px; margin-top: -2px;
+}
+.login-remember input { width: auto; margin: 0; }
 .login-card select {
   width: 100%; padding: 12px 14px; border: 1px solid var(--gray-200);
   border-radius: 8px; font-size: 14px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -386,7 +402,19 @@ textarea { resize: vertical; min-height: 80px; }
     <select id="loginUser">
       <option value="">Selecione o usuário</option>
     </select>
-    <input type="password" id="loginPass" placeholder="Senha" onkeydown="if(event.key==='Enter'){doLogin();}" />
+    <div class="login-pass-wrap">
+      <input type="password" id="loginPass" placeholder="Senha" onkeydown="if(event.key==='Enter'){doLogin();}" />
+      <button type="button" class="login-eye" id="loginEyeBtn" onclick="togglePassVisibility()" tabindex="-1">
+        <svg id="loginEyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+      </button>
+    </div>
+    <label class="login-remember">
+      <input type="checkbox" id="loginRemember">
+      Lembrar senha
+    </label>
     <button class="btn-login" onclick="doLogin()">Entrar</button>
     <div class="login-error" id="loginError">Usuário ou senha incorretos</div>
   </div>
@@ -1303,6 +1331,29 @@ function renderLoginUserOptions() {
   sel.innerHTML = '<option value="">Selecione o usuário</option>' + opts;
 }
 
+function togglePassVisibility() {
+  const inp = document.getElementById('loginPass');
+  const icon = document.getElementById('loginEyeIcon');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    icon.innerHTML = '<path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 5c7 0 11 7 11 7a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+  } else {
+    inp.type = 'password';
+    icon.innerHTML = '<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path><circle cx="12" cy="12" r="3"></circle>';
+  }
+}
+
+function aplicarCredenciaisLembradas() {
+  const saved = localStorage.getItem('pf_remember');
+  if (!saved) return;
+  try {
+    const { username, senha } = JSON.parse(saved);
+    document.getElementById('loginUser').value = username;
+    document.getElementById('loginPass').value = senha;
+    document.getElementById('loginRemember').checked = true;
+  } catch (e) { /* ignora */ }
+}
+
 function doLogin() {
   const u = document.getElementById('loginUser').value.trim();
   const p = document.getElementById('loginPass').value.trim();
@@ -1311,6 +1362,11 @@ function doLogin() {
   const user = db.usuarios.find(x=>x.username===u);
   if (!user || (user.senha||'').toLowerCase() !== p.toLowerCase()) { err.style.display='block'; err.textContent='Senha incorreta'; return; }
   err.style.display='none';
+  if (document.getElementById('loginRemember').checked) {
+    localStorage.setItem('pf_remember', JSON.stringify({ username: u, senha: p }));
+  } else {
+    localStorage.removeItem('pf_remember');
+  }
   currentUser = u;
   currentUserObj = user;
   document.getElementById('loginScreen').style.display = 'none';
@@ -1340,7 +1396,8 @@ function doLogout() {
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('app').style.display = 'none';
   renderLoginUserOptions();
-  document.getElementById('loginPass').value = '';
+  if (!localStorage.getItem('pf_remember')) document.getElementById('loginPass').value = '';
+  aplicarCredenciaisLembradas();
 }
 
 // ============================================================
@@ -2153,6 +2210,7 @@ function renderPedidos() {
       <td>
         <button class="btn btn-secondary btn-sm" onclick="editPedido(${p.id})">✏️</button>
         <button class="btn btn-secondary btn-sm" onclick="gerarOrcamento(${p.id},'pedidos')" title="Gerar Orçamento PDF">🧾</button>
+        ${p.entregaTipo==='Entrega no endereço'?`<button class="btn btn-secondary btn-sm" onclick="gerarDocumentoMotoboy(${p.id},'pedidos')" title="Documento para Motoboy">🛵</button>`:''}
         <button class="btn btn-warning btn-sm" onclick="moverAguardando(${p.id})">⏳ Enviar</button>
         <button class="btn btn-danger btn-sm" onclick="reprovarPedido(${p.id})">❌</button>
       </td>
@@ -2254,6 +2312,54 @@ function gerarOrcamento(id, origem) {
 }
 window.onafterprint = function() { document.body.classList.remove('print-orcamento'); };
 
+function gerarDocumentoMotoboy(id, origem) {
+  const lista = origem === 'aguardando' ? db.aguardando : db.pedidos;
+  const p = lista.find(x=>x.id==id);
+  if (!p) { alert('Pedido não encontrado'); return; }
+  const prod = db.prodacabado.find(x=>x.id==p.produtoId);
+
+  const html = `
+    <div class="orc-header">
+      <img class="app-logo-img" alt="Planeta Flores">
+      <div class="orc-empresa">
+        <h2>Planeta Flores</h2>
+        <p>Floricultura • Desde 2003</p>
+      </div>
+      <div class="orc-numero">
+        <strong>FICHA DE ENTREGA Nº ${p.numero||p.id}</strong>
+        Emitido em: ${fmtDate(today())}
+      </div>
+    </div>
+
+    <h3 class="orc-produto-title">Entrega</h3>
+    <table class="orc-table">
+      <tbody>
+        <tr><td style="width:35%"><strong>Endereço</strong></td><td>${p.endereco||'-'}</td></tr>
+        <tr><td><strong>Data da Entrega</strong></td><td>${p.dataEntregaProgramada?fmtDate(p.dataEntregaProgramada):'-'}</td></tr>
+        <tr><td><strong>Horário</strong></td><td>${p.horaEntregaProgramada||'-'}</td></tr>
+        <tr><td><strong>Pessoa Responsável</strong></td><td>${p.destinatario||'-'}</td></tr>
+        <tr><td><strong>Telefone de Contato</strong></td><td>${p.telContato||'-'}</td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="orc-produto-title">Produto a Entregar</h3>
+    <table class="orc-table">
+      <tbody>
+        <tr><td><strong>${prod?.nome||p.produtoNome||'-'}</strong></td></tr>
+      </tbody>
+    </table>
+
+    ${p.obs ? `<p class="orc-obs"><strong>Observações:</strong> ${p.obs}</p>` : ''}
+
+    <p class="orc-footer">Ficha de entrega gerada em ${fmtDate(today())} • Planeta Flores — Floricultura desde 2003</p>
+  `;
+
+  document.getElementById('orcamentoPrint').innerHTML = html;
+  document.querySelectorAll('#orcamentoPrint .app-logo-img').forEach(img => img.src = 'data:image/png;base64,' + LOGO_B64);
+  document.body.classList.add('print-orcamento');
+  window.print();
+}
+
 function moverAguardando(id) {
   const p = db.pedidos.find(x=>x.id==id);
   if (!confirm(`Mover pedido #${p.numero||id} para Aguardando Cliente?`)) return;
@@ -2315,6 +2421,7 @@ function renderAguardando() {
       <td>
         ${p.followUp==='Entregue'?`<button class="btn btn-success btn-sm" onclick="moverCobranca(${p.id})">💰 Cobrar</button>`:''}
         <button class="btn btn-secondary btn-sm" onclick="gerarOrcamento(${p.id},'aguardando')" title="Gerar Orçamento PDF">🧾</button>
+        ${p.entregaTipo==='Entrega no endereço'?`<button class="btn btn-secondary btn-sm" onclick="gerarDocumentoMotoboy(${p.id},'aguardando')" title="Documento para Motoboy">🛵</button>`:''}
         <button class="btn btn-secondary btn-sm" onclick="reverterAguardando(${p.id})">↩️ Reverter</button>
       </td>
     </tr>`;
@@ -2571,6 +2678,7 @@ async function initApp() {
     await save();
   }
   renderLoginUserOptions();
+  aplicarCredenciaisLembradas();
   document.getElementById('loginLoading').style.display = 'none';
   document.getElementById('loginCardContent').style.display = 'block';
   pingSupabase();
