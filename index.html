@@ -682,7 +682,7 @@ textarea { resize: vertical; min-height: 80px; }
     <div class="screen" id="screen-materiaprima">
       <div class="page-header">
         <div><h1>Matéria-Prima</h1><p>Cadastro de insumos e materiais base</p></div>
-        <button class="btn btn-primary" onclick="refreshCategoriaSelects();openModal('modalMP')">+ Nova Matéria-Prima</button>
+        <button class="btn btn-primary" onclick="openNovaMP()">+ Nova Matéria-Prima</button>
       </div>
       <div class="card">
         <div class="flex gap-8 mb-16">
@@ -701,7 +701,7 @@ textarea { resize: vertical; min-height: 80px; }
     <div class="screen" id="screen-insumos">
       <div class="page-header">
         <div><h1>Insumos / Embalagens</h1><p>Materiais de apoio e embalagens</p></div>
-        <button class="btn btn-primary" onclick="refreshCategoriaSelects();openModal('modalInsumo')">+ Novo Insumo</button>
+        <button class="btn btn-primary" onclick="openNovaInsumo()">+ Novo Insumo</button>
       </div>
       <div class="card">
         <div class="flex gap-8 mb-16">
@@ -720,7 +720,7 @@ textarea { resize: vertical; min-height: 80px; }
     <div class="screen" id="screen-fornecedores">
       <div class="page-header">
         <div><h1>Fornecedores</h1><p>Cadastro de fornecedores</p></div>
-        <button class="btn btn-primary" onclick="openModal('modalForn')">+ Novo Fornecedor</button>
+        <button class="btn btn-primary" onclick="openNovoForn()">+ Novo Fornecedor</button>
       </div>
       <div class="card">
         <div class="search-bar" style="flex:1;margin-bottom:16px"><input type="text" placeholder="Buscar fornecedor..." oninput="filterTable('fornTable',this.value)"></div>
@@ -737,7 +737,7 @@ textarea { resize: vertical; min-height: 80px; }
     <div class="screen" id="screen-prodacabado">
       <div class="page-header">
         <div><h1>Produtos Acabados</h1><p>Buquês, arranjos e composições</p></div>
-        <button class="btn btn-primary" onclick="refreshCategoriaSelects();openModal('modalPA')">+ Novo Produto</button>
+        <button class="btn btn-primary" onclick="openNovaPA()">+ Novo Produto</button>
       </div>
       <div class="card">
         <div class="search-bar" style="flex:1;margin-bottom:16px"><input type="text" placeholder="Buscar produto..." oninput="filterTable('paTable',this.value)"></div>
@@ -770,7 +770,7 @@ textarea { resize: vertical; min-height: 80px; }
     <div class="screen" id="screen-vendedores">
       <div class="page-header">
         <div><h1>Vendedores</h1><p>Cadastro da equipe de vendas</p></div>
-        <button class="btn btn-primary" onclick="openModal('modalVend')">+ Novo Vendedor</button>
+        <button class="btn btn-primary" onclick="openNovoVend()">+ Novo Vendedor</button>
       </div>
       <div class="card">
         <div class="table-wrap">
@@ -1191,7 +1191,7 @@ textarea { resize: vertical; min-height: 80px; }
       <div id="mpFornecedores"></div>
       <button class="btn btn-secondary btn-sm" onclick="addFornMP()">+ Adicionar Fornecedor</button>
       <div class="section-divider"><span>Fotos</span></div>
-      <div class="foto-upload" onclick="document.getElementById('mpFotoInput').click()">
+      <div class="foto-upload">
         <input type="file" id="mpFotoInput" accept="image/*" capture="environment" multiple style="position:absolute;opacity:0;width:100%;height:100%;cursor:pointer" onchange="previewFotos(this,'mpFotosGrid')">
         <div style="font-size:28px">📷</div>
         <p>Clique para tirar foto ou escolher da galeria</p>
@@ -1871,29 +1871,46 @@ async function save() {
   }
 }
 
-// ── CARREGAR: Supabase primeiro ──────────────────────────────
+// ── CARREGAR: Supabase primeiro (com nova tentativa automática) ──
 async function load() {
   let carregouRemoto = false;
-  try {
-    const { data, error } = await Promise.race([
-      supabaseClient.from(SUPABASE_TABLE).select('db, next_id, updated_at').eq('id', 1).maybeSingle(),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000))
-    ]);
-    if (error) {
-      console.error('Erro ao carregar do Supabase:', error.message);
-    } else if (data) {
-      applyRemoteData(data);
-      _lastServerTimestamp = data.updated_at || null;
-      carregouRemoto = true;
+  const TENTATIVAS = 3;
+  for (let tentativa = 1; tentativa <= TENTATIVAS && !carregouRemoto; tentativa++) {
+    try {
+      const { data, error } = await Promise.race([
+        supabaseClient.from(SUPABASE_TABLE).select('db, next_id, updated_at').eq('id', 1).maybeSingle(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000))
+      ]);
+      if (error) {
+        console.error(`Erro ao carregar do Supabase (tentativa ${tentativa}):`, error.message);
+      } else if (data) {
+        applyRemoteData(data);
+        _lastServerTimestamp = data.updated_at || null;
+        carregouRemoto = true;
+      } else {
+        // Tabela existe mas está vazia (id=1 não encontrado) — não é falha de conexão
+        carregouRemoto = true;
+      }
+    } catch (e) {
+      console.warn(`Supabase indisponível (tentativa ${tentativa}/${TENTATIVAS}):`, e.message);
+      if (tentativa < TENTATIVAS) await new Promise(r => setTimeout(r, 1500 * tentativa));
     }
-  } catch (e) {
-    console.warn('Supabase indisponível, carregando backup local:', e.message);
   }
   if (!carregouRemoto) {
     loadLocalBackup();
     applyRemoteData({ db, next_id: nextId }); // ensure fields exist
+    showSyncStatus('erro');
   }
+  return carregouRemoto;
 }
+
+// ── Reconecta automaticamente quando a internet volta ────────
+window.addEventListener('online', async () => {
+  console.log('🌐 Conexão restabelecida, ressincronizando...');
+  const ok = await load();
+  if (ok) { reRenderCurrentScreen(); saveLocalBackup(); showSyncStatus('sync'); }
+});
+
 
 // ── POLLING: detecta alterações de outros usuários ──────────
 // Supabase Realtime não é garantido no plano free com anonymous key.
@@ -1983,9 +2000,12 @@ function showSyncStatus(status) {
   };
   const s = msgs[status] || msgs.ok;
   el.innerHTML = `<span style="color:${s.color};font-size:12px">${s.icon} ${s.text}</span>`;
-  // Auto-apaga após 3s
   clearTimeout(el._timeout);
-  el._timeout = setTimeout(() => { el.innerHTML = ''; }, 3000);
+  // 'Offline' fica visível até a conexão ser restabelecida (não é escondido sozinho),
+  // para o usuário saber que os dados ainda não foram sincronizados na nuvem.
+  if (status !== 'erro') {
+    el._timeout = setTimeout(() => { el.innerHTML = ''; }, 3000);
+  }
 }
 
 // ============================================================
@@ -2198,6 +2218,19 @@ function daysBetween(a,b) {
 // ============================================================
 //  FORNECEDORES
 // ============================================================
+function openNovoForn() {
+  document.getElementById('fornId').value = '';
+  document.getElementById('fornNome').value = '';
+  document.getElementById('fornDoc').value = '';
+  document.getElementById('fornTel').value = '';
+  document.getElementById('fornEmail').value = '';
+  document.getElementById('fornContato').value = '';
+  document.getElementById('fornCidade').value = '';
+  document.getElementById('fornObs').value = '';
+  document.getElementById('modalFornTitle').textContent = 'Novo Fornecedor';
+  openModal('modalForn');
+}
+
 function saveForn() {
   const id = document.getElementById('fornId').value;
   const obj = {
@@ -2282,6 +2315,20 @@ function addFornMP() {
 
 function removeFornRow(id) { document.getElementById('mpFRow_'+id)?.remove(); }
 
+function openNovaMP() {
+  document.getElementById('mpId').value = '';
+  document.getElementById('mpNome').value = '';
+  document.getElementById('mpUnidade').value = '';
+  document.getElementById('mpEstoque').value = '';
+  document.getElementById('mpFornecedores').innerHTML = '';
+  document.getElementById('mpFotosGrid').innerHTML = '';
+  document.getElementById('mpFotoInput').value = '';
+  mpFornRows = [];
+  document.getElementById('modalMPTitle').textContent = 'Nova Matéria-Prima';
+  refreshCategoriaSelects();
+  openModal('modalMP');
+}
+
 function saveMP() {
   const id = document.getElementById('mpId').value;
   const fRows = document.querySelectorAll('#mpFornecedores .fornecedor-row');
@@ -2356,6 +2403,20 @@ function renderMP() {
 // ============================================================
 //  INSUMOS
 // ============================================================
+function openNovaInsumo() {
+  document.getElementById('insId').value = '';
+  document.getElementById('insNome').value = '';
+  document.getElementById('insUnidade').value = '';
+  document.getElementById('insCusto').value = '';
+  document.getElementById('insFotosGrid').innerHTML = '';
+  document.getElementById('insFotoInput').value = '';
+  renderFornSelects();
+  document.getElementById('insFornecedor').value = '';
+  document.getElementById('modalInsumoTitle').textContent = 'Novo Insumo';
+  refreshCategoriaSelects();
+  openModal('modalInsumo');
+}
+
 function saveInsumo() {
   const id = document.getElementById('insId').value;
   const obj = {
@@ -2489,6 +2550,23 @@ function getPAItens() {
   return [...mpItems, ...insItems];
 }
 
+function openNovaPA() {
+  document.getElementById('paId').value = '';
+  document.getElementById('paNome').value = '';
+  document.getElementById('paDesc').value = '';
+  document.getElementById('paMarkup').value = 2.5;
+  if (document.getElementById('paTempoProd')) document.getElementById('paTempoProd').value = '';
+  document.getElementById('paItensMP').innerHTML = '';
+  document.getElementById('paItensIns').innerHTML = '';
+  document.getElementById('paFotosGrid').innerHTML = '';
+  document.getElementById('paFotoInput').value = '';
+  document.getElementById('paPrecoVenda').value = '';
+  document.getElementById('modalPATitle').textContent = 'Novo Produto';
+  refreshCategoriaSelects();
+  calcPA();
+  openModal('modalPA');
+}
+
 function savePA() {
   const id = document.getElementById('paId').value;
   const markup = parseFloat(document.getElementById('paMarkup').value) || 1;
@@ -2612,6 +2690,15 @@ function salvarPrecoTabela(id, valor) {
 // ============================================================
 //  VENDEDORES
 // ============================================================
+function openNovoVend() {
+  document.getElementById('vendId').value = '';
+  document.getElementById('vendNome').value = '';
+  document.getElementById('vendTel').value = '';
+  document.getElementById('vendEmail').value = '';
+  document.getElementById('modalVendTitle').textContent = 'Novo Vendedor';
+  openModal('modalVend');
+}
+
 function saveVend() {
   const id = document.getElementById('vendId').value;
   const obj = {
@@ -3491,8 +3578,8 @@ function renderAll() {
 //  INIT
 // ============================================================
 async function initApp() {
-  await load();
-  // seed demo data if empty
+  const conectou = await load();
+  // seed demo data if empty (só grava na nuvem se realmente confirmamos que o banco remoto está vazio)
   if (db.fornecedores.length === 0) {
     db.fornecedores = [
       {id:1,nome:'Flores do Campo Ltda',doc:'12.345.678/0001-00',tel:'(47) 99001-1234',email:'contato@floresdocampo.com',cidade:'Blumenau/SC'},
@@ -3504,7 +3591,7 @@ async function initApp() {
       {id:2,nome:'Carlos Eduardo',tel:'(47) 99333-4444',email:'carlos@planetaflores.com',meta:4000}
     ];
     nextId.vend = 3;
-    save(); // background
+    if (conectou) save(); // só sincroniza com a nuvem se a conexão foi confirmada
   }
   if (db.motivosPerda.length === 0) {
     db.motivosPerda = [
@@ -3516,7 +3603,7 @@ async function initApp() {
       {id:6,nome:'Produto fora de estoque'}
     ];
     nextId.mot = 7;
-    save(); // background
+    if (conectou) save(); // background
   }
   if (db.usuarios.length === 0) {
     const telasPadrao = ['dashboard','pedidos','aguardando','cobranca','concluidos','reprovados'];
@@ -3527,7 +3614,7 @@ async function initApp() {
       {id:4, nome:'Vendedor 3', username:'vendedor3', senha:'v3', isAdmin:false, telas:telasPadrao}
     ];
     nextId.usr = 5;
-    save(); // background
+    if (conectou) save(); // background
   }
   renderLoginUserOptions();
   aplicarCredenciaisLembradas();
