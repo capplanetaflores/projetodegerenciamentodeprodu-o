@@ -334,6 +334,7 @@ textarea { resize: vertical; min-height: 80px; }
 .leadtime-fill.danger { background: var(--danger); }
 
 /* CHART SIMPLE */
+#dashStats { grid-template-columns: repeat(5, 1fr) !important; }
 .bar-chart { display: flex; gap: 8px; align-items: flex-end; height: 160px; padding: 0 4px; }
 .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .bar-col .bar { width: 100%; background: var(--verde); border-radius: 4px 4px 0 0; transition: height 0.3s; min-height: 4px; }
@@ -359,6 +360,52 @@ textarea { resize: vertical; min-height: 80px; }
 .font-medium { font-weight: 500; }
 .price { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 17px; font-weight: 600; color: var(--verde-dark); }
 
+/* COMPRA - ITENS MULTI */
+.compra-item-row {
+  display: grid; grid-template-columns: 1fr 1fr 100px 110px 110px 36px;
+  gap: 8px; align-items: center; margin-bottom: 8px;
+  padding: 10px; background: var(--gray-50); border-radius: 8px; border: 1px solid var(--gray-200);
+}
+.compra-item-row label { font-size: 11px; color: var(--gray-400); margin-bottom: 2px; }
+.compra-item-col { display: flex; flex-direction: column; gap: 3px; }
+
+/* MOBILE */
+.hamburger-btn {
+  display: none;
+  background: var(--verde-dark); border: none; cursor: pointer;
+  padding: 10px 14px; border-radius: 8px;
+  color: white; font-size: 20px; line-height: 1;
+  position: fixed; top: 12px; left: 12px; z-index: 200;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.sidebar-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5); z-index: 99;
+}
+.sidebar-overlay.open { display: block; }
+
+@media (max-width: 768px) {
+  .hamburger-btn { display: flex; align-items: center; justify-content: center; }
+  .sidebar {
+    transform: translateX(-100%); transition: transform 0.25s ease;
+    z-index: 150;
+  }
+  .sidebar.mobile-open { transform: translateX(0); }
+  .main-content { margin-left: 0; padding: 16px 12px; padding-top: 60px; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .form-grid, .form-grid-3 { grid-template-columns: 1fr; }
+  .page-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .page-header h1 { font-size: 22px; }
+  .modal { max-width: 100%; margin: 0; border-radius: 12px 12px 0 0; max-height: 95vh; }
+  .modal-overlay { padding: 0; align-items: flex-end; }
+  .table-wrap { font-size: 12px; }
+  th, td { padding: 8px 8px; }
+  .compra-item-row { grid-template-columns: 1fr 1fr; gap: 6px; }
+  .login-card { width: 95%; padding: 32px 20px; }
+  .btn { font-size: 12px; padding: 8px 12px; }
+  .modal-header h2 { font-size: 18px; }
+}
+
 /* PERMISSÕES */
 .telas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; margin-top: 8px; }
 .telas-grid label { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; }
@@ -382,9 +429,59 @@ textarea { resize: vertical; min-height: 80px; }
 .orc-obs { font-size: 13px; margin-bottom: 12px; }
 .orc-footer { text-align: center; font-size: 11px; color: var(--gray-400); margin-top: 24px; border-top: 1px solid var(--gray-200); padding-top: 10px; }
 
+/* TABELA PRECOS PRINT */
+#tabPrecosPrint { display: none; }
+#estoquePrint { display: none; }
+
 @media print {
-  body.print-orcamento #app, body.print-orcamento #loginScreen { display: none !important; }
+  /* Hide hamburger button in all prints */
+  .hamburger-btn, .sidebar-overlay { display: none !important; }
+
+  body.print-orcamento #app, body.print-orcamento #loginScreen, body.print-orcamento #tabPrecosPrint, body.print-orcamento #estoquePrint { display: none !important; }
   body.print-orcamento #orcamentoPrint { display: block !important; padding: 30px; max-width: 800px; margin: 0 auto; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+  body.print-tabprecos #app, body.print-tabprecos #loginScreen, body.print-tabprecos #orcamentoPrint, body.print-tabprecos #estoquePrint { display: none !important; }
+  body.print-tabprecos #tabPrecosPrint {
+    display: block !important; padding: 24px 30px; max-width: 700px; margin: 0 auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  body.print-tabprecos #tabPrecosPrint .tp-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid #364540;
+  }
+  body.print-tabprecos #tabPrecosPrint .tp-header-left { display: flex; align-items: center; gap: 12px; }
+  body.print-tabprecos #tabPrecosPrint .tp-header-left img { width: 56px; height: 56px; object-fit: contain; }
+  body.print-tabprecos #tabPrecosPrint .tp-header h2 { font-size: 22px; color: #364540; margin: 0; }
+  body.print-tabprecos #tabPrecosPrint .tp-header p { font-size: 12px; color: #888; margin: 2px 0 0; }
+  body.print-tabprecos #tabPrecosPrint table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  body.print-tabprecos #tabPrecosPrint th {
+    background: #364540; color: white; padding: 9px 12px; text-align: left; font-size: 12px;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  body.print-tabprecos #tabPrecosPrint td { padding: 9px 12px; border-bottom: 1px solid #e0e0d8; vertical-align: middle; }
+  body.print-tabprecos #tabPrecosPrint tr:nth-child(even) td { background: #f5f5f0; }
+  body.print-tabprecos #tabPrecosPrint .tp-footer { margin-top: 16px; text-align: center; font-size: 11px; color: #999; border-top: 1px solid #ddd; padding-top: 8px; }
+
+  body.print-estoque #app, body.print-estoque #loginScreen, body.print-estoque #orcamentoPrint, body.print-estoque #tabPrecosPrint { display: none !important; }
+  body.print-estoque #estoquePrint {
+    display: block !important; padding: 24px 30px; max-width: 900px; margin: 0 auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  body.print-estoque #estoquePrint .ep-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid #364540;
+  }
+  body.print-estoque #estoquePrint .ep-header h2 { font-size: 20px; color: #364540; }
+  body.print-estoque #estoquePrint h3 { font-size: 13px; color: #364540; border-bottom: 1px solid #c9b48a; padding-bottom: 4px; margin: 16px 0 8px; }
+  body.print-estoque #estoquePrint table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 16px; }
+  body.print-estoque #estoquePrint th { background: #364540; color: white; padding: 7px 10px; text-align: left; font-size: 11px; text-transform: uppercase; }
+  body.print-estoque #estoquePrint td { padding: 7px 10px; border-bottom: 1px solid #e0e0d8; }
+  body.print-estoque #estoquePrint tr:nth-child(even) td { background: #f5f5f0; }
+  body.print-estoque #estoquePrint .ep-footer { margin-top: 16px; text-align: center; font-size: 11px; color: #999; border-top: 1px solid #ddd; padding-top: 8px; }
+  body.print-estoque #estoquePrint .stats-row { display: flex; gap: 16px; margin-bottom: 16px; }
+  body.print-estoque #estoquePrint .stat-box { flex: 1; border: 1px solid #ddd; border-radius: 6px; padding: 10px; }
+  body.print-estoque #estoquePrint .stat-box .label { font-size: 10px; color: #888; text-transform: uppercase; }
+  body.print-estoque #estoquePrint .stat-box .val { font-size: 16px; font-weight: 700; color: #364540; }
 }
 
 </style>
@@ -426,6 +523,10 @@ textarea { resize: vertical; min-height: 80px; }
   </div>
 </div>
 
+<!-- HAMBURGER (mobile) -->
+<button class="hamburger-btn" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
 <!-- APP -->
 <div id="app">
   <!-- SIDEBAR -->
@@ -439,6 +540,7 @@ textarea { resize: vertical; min-height: 80px; }
       <div class="nav-section">Principal</div>
       <div class="nav-item active" data-tela="dashboard" onclick="showScreen('dashboard')">📊 Dashboard</div>
       <div class="nav-section">Cadastros</div>
+      <div class="nav-item" data-tela="categorias" onclick="showScreen('categorias')">🏷️ Categorias</div>
       <div class="nav-item" data-tela="materiaprima" onclick="showScreen('materiaprima')">🌿 Matéria-Prima</div>
       <div class="nav-item" data-tela="insumos" onclick="showScreen('insumos')">📦 Insumos / Embalagens</div>
       <div class="nav-item" data-tela="fornecedores" onclick="showScreen('fornecedores')">🏭 Fornecedores</div>
@@ -456,6 +558,7 @@ textarea { resize: vertical; min-height: 80px; }
       <div class="nav-item" data-tela="reprovados" onclick="showScreen('reprovados')">❌ Reprovados</div>
       <div class="nav-item" data-tela="motivosperda" onclick="showScreen('motivosperda')">🚫 Motivos de Perda</div>
       <div class="nav-section" id="navSectionAdmin">Administração</div>
+      <div class="nav-item" data-tela="custohora" onclick="showScreen('custohora')">⏱️ Custo/Hora</div>
       <div class="nav-item" data-tela="usuarios" id="navUsuarios" onclick="showScreen('usuarios')">🔐 Usuários e Permissões</div>
     </nav>
     <div class="sidebar-footer">
@@ -463,6 +566,7 @@ textarea { resize: vertical; min-height: 80px; }
         <div class="user-avatar" id="sidebarAvatar">A</div>
         <div class="user-name" id="sidebarUser">Admin</div>
       </div>
+      <div id="syncIndicator" style="min-height:18px;margin-top:4px;text-align:center"></div>
       <button class="btn-logout" onclick="doLogout()">Sair</button>
     </div>
   </div>
@@ -474,14 +578,22 @@ textarea { resize: vertical; min-height: 80px; }
     <div class="screen active" id="screen-dashboard">
       <div class="page-header">
         <div><h1>Dashboard</h1><p>Visão geral dos pedidos e vendas</p></div>
-        <div class="flex gap-8 items-center">
-          <select id="dashPeriodo" onchange="renderDashboard()" style="width:140px">
-            <option>Este mês</option><option>Últimos 3 meses</option><option>Este ano</option>
+        <div class="flex gap-8 items-center" style="flex-wrap:wrap">
+          <select id="dashAno" onchange="renderDashboard()" style="width:100px">
+            <option value="">Todos anos</option>
           </select>
+          <select id="dashMes" onchange="renderDashboard()" style="width:120px">
+            <option value="">Todos meses</option>
+            <option value="01">Janeiro</option><option value="02">Fevereiro</option><option value="03">Março</option>
+            <option value="04">Abril</option><option value="05">Maio</option><option value="06">Junho</option>
+            <option value="07">Julho</option><option value="08">Agosto</option><option value="09">Setembro</option>
+            <option value="10">Outubro</option><option value="11">Novembro</option><option value="12">Dezembro</option>
+          </select>
+          <button class="btn btn-secondary btn-sm" onclick="limparFiltrosDash()">Limpar</button>
         </div>
       </div>
-      <div class="stats-grid" id="dashStats"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="stats-grid" id="dashStats" style="grid-template-columns:repeat(5,1fr)"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
         <div class="card">
           <div class="card-header"><h3>Pedidos por Mês (Quantidade)</h3></div>
           <div class="bar-chart" id="dashChartQtd"></div>
@@ -493,7 +605,14 @@ textarea { resize: vertical; min-height: 80px; }
           <div style="display:flex;gap:8px;justify-content:center;margin-top:8px" id="dashChartLabelsVal"></div>
         </div>
       </div>
-      <div class="card" style="margin-top:16px">
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header"><h3>📦 Tipos de Entrega</h3></div>
+        <div style="display:flex;justify-content:center;padding:0 32px">
+          <div id="dashEntregaChart" style="display:flex;gap:48px;align-items:flex-end;height:200px;width:100%;max-width:700px"></div>
+        </div>
+        <div style="display:flex;gap:24px;justify-content:center;margin-top:12px;padding-bottom:8px;font-size:13px;flex-wrap:wrap" id="dashEntregaLegend"></div>
+      </div>
+      <div class="card">
         <div class="card-header"><h3>Últimos Pedidos Entregues</h3></div>
         <div class="table-wrap">
           <table id="dashTable">
@@ -504,11 +623,66 @@ textarea { resize: vertical; min-height: 80px; }
       </div>
     </div>
 
+    <!-- CATEGORIAS -->
+    <div class="screen" id="screen-categorias">
+      <div class="page-header">
+        <div><h1>Categorias</h1><p>Categorias para Matéria-Prima, Insumos e Produtos Acabados</p></div>
+        <button class="btn btn-primary" onclick="openNovaCategoria()">+ Nova Categoria</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+        <!-- Matéria-Prima -->
+        <div class="card">
+          <div class="card-header">
+            <h3>🌿 Matéria-Prima</h3>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Categoria</th><th>Ações</th></tr></thead>
+              <tbody id="catMPTable"></tbody>
+            </table>
+          </div>
+          <div style="margin-top:12px">
+            <button class="btn btn-secondary btn-sm" onclick="openNovaCategoria('mp')">+ Nova Categoria MP</button>
+          </div>
+        </div>
+        <!-- Insumos -->
+        <div class="card">
+          <div class="card-header">
+            <h3>📦 Insumos / Embalagens</h3>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Categoria</th><th>Ações</th></tr></thead>
+              <tbody id="catInsTable"></tbody>
+            </table>
+          </div>
+          <div style="margin-top:12px">
+            <button class="btn btn-secondary btn-sm" onclick="openNovaCategoria('ins')">+ Nova Categoria Insumo</button>
+          </div>
+        </div>
+        <!-- Produtos Acabados -->
+        <div class="card">
+          <div class="card-header">
+            <h3>💐 Produtos Acabados</h3>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Categoria</th><th>Ações</th></tr></thead>
+              <tbody id="catPATable"></tbody>
+            </table>
+          </div>
+          <div style="margin-top:12px">
+            <button class="btn btn-secondary btn-sm" onclick="openNovaCategoria('pa')">+ Nova Categoria Produto</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- MATÉRIA PRIMA -->
     <div class="screen" id="screen-materiaprima">
       <div class="page-header">
         <div><h1>Matéria-Prima</h1><p>Cadastro de insumos e materiais base</p></div>
-        <button class="btn btn-primary" onclick="openModal('modalMP')">+ Nova Matéria-Prima</button>
+        <button class="btn btn-primary" onclick="refreshCategoriaSelects();openModal('modalMP')">+ Nova Matéria-Prima</button>
       </div>
       <div class="card">
         <div class="flex gap-8 mb-16">
@@ -527,7 +701,7 @@ textarea { resize: vertical; min-height: 80px; }
     <div class="screen" id="screen-insumos">
       <div class="page-header">
         <div><h1>Insumos / Embalagens</h1><p>Materiais de apoio e embalagens</p></div>
-        <button class="btn btn-primary" onclick="openModal('modalInsumo')">+ Novo Insumo</button>
+        <button class="btn btn-primary" onclick="refreshCategoriaSelects();openModal('modalInsumo')">+ Novo Insumo</button>
       </div>
       <div class="card">
         <div class="flex gap-8 mb-16">
@@ -563,7 +737,7 @@ textarea { resize: vertical; min-height: 80px; }
     <div class="screen" id="screen-prodacabado">
       <div class="page-header">
         <div><h1>Produtos Acabados</h1><p>Buquês, arranjos e composições</p></div>
-        <button class="btn btn-primary" onclick="openModal('modalPA')">+ Novo Produto</button>
+        <button class="btn btn-primary" onclick="refreshCategoriaSelects();openModal('modalPA')">+ Novo Produto</button>
       </div>
       <div class="card">
         <div class="search-bar" style="flex:1;margin-bottom:16px"><input type="text" placeholder="Buscar produto..." oninput="filterTable('paTable',this.value)"></div>
@@ -580,7 +754,7 @@ textarea { resize: vertical; min-height: 80px; }
     <div class="screen" id="screen-tabprecos">
       <div class="page-header">
         <div><h1>Tabela de Preços</h1><p>Preços de venda dos produtos acabados</p></div>
-        <button class="btn btn-secondary" onclick="window.print()">🖨️ Imprimir</button>
+        <button class="btn btn-secondary" onclick="imprimirTabPrecos()">🖨️ Imprimir</button>
       </div>
       <div class="card">
         <div class="table-wrap">
@@ -712,6 +886,22 @@ textarea { resize: vertical; min-height: 80px; }
       </div>
     </div>
 
+    <!-- CUSTO HORA -->
+    <div class="screen" id="screen-custohora">
+      <div class="page-header">
+        <div><h1>Custo / Hora</h1><p>Cadastro do custo hora de produção por vigência</p></div>
+        <button class="btn btn-primary" onclick="openNovoCustoHora()">+ Nova Vigência</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Vigência (De)</th><th>Vigência (Até)</th><th>Custo/Hora (R$)</th><th>Descrição</th><th>Status</th><th>Ações</th></tr></thead>
+            <tbody id="custoHoraTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <!-- COMPRAS -->
     <div class="screen" id="screen-compras">
       <div class="page-header">
@@ -724,7 +914,7 @@ textarea { resize: vertical; min-height: 80px; }
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Data</th><th>Fornecedor</th><th>Produto/Material</th><th>Qtd</th><th>Custo Unit.</th><th>Total</th><th>Ações</th></tr></thead>
+            <thead><tr><th>Data</th><th>Fornecedor / NF</th><th>Produto/Material</th><th>Qtd</th><th>Custo Unit.</th><th>Total</th><th>Ações</th></tr></thead>
             <tbody id="comprasTable"></tbody>
           </table>
         </div>
@@ -735,7 +925,14 @@ textarea { resize: vertical; min-height: 80px; }
     <div class="screen" id="screen-estoque">
       <div class="page-header">
         <div><h1>Estoque</h1><p>Controle de estoque por produto, quantidade e valor</p></div>
-        <button class="btn btn-warning" onclick="openNovoDescarte()">🗑️ Registrar Descarte</button>
+        <div class="flex gap-8 items-center">
+          <div style="display:flex;background:var(--gray-100);border-radius:8px;padding:3px;gap:2px">
+            <button id="estViewQtd" class="tab active" onclick="setEstoqueView('qtd')" style="padding:6px 14px;font-size:12px">📦 Quantidade</button>
+            <button id="estViewVal" class="tab" onclick="setEstoqueView('val')" style="padding:6px 14px;font-size:12px">💰 Valor</button>
+          </div>
+          <button class="btn btn-secondary" onclick="gerarEstoquePDF()">🖨️ Gerar PDF</button>
+          <button class="btn btn-warning" onclick="openNovoDescarte()">🗑️ Registrar Descarte</button>
+        </div>
       </div>
       <!-- Filtros -->
       <div class="card mb-16">
@@ -767,6 +964,16 @@ textarea { resize: vertical; min-height: 80px; }
       </div>
       <!-- Resumo -->
       <div class="stats-grid" id="estSummary"></div>
+      <!-- Saldo por Produto -->
+      <div class="card mb-16">
+        <div class="card-header"><h3>Saldo por Produto/Material</h3></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Produto/Material</th><th>Tipo</th><th>Unidade</th><th>Saldo Inicial</th><th>Entradas (Compras)</th><th>Saídas (Vendas)</th><th>Descartes</th><th>Saldo Final</th></tr></thead>
+            <tbody id="estoqueSaldoTable"></tbody>
+          </table>
+        </div>
+      </div>
       <!-- Tabela Estoque -->
       <div class="card">
         <div class="card-header"><h3>Movimentações de Estoque</h3></div>
@@ -816,14 +1023,14 @@ textarea { resize: vertical; min-height: 80px; }
         </div>
       </div>
       <!-- Cards resumo -->
-      <div class="stats-grid" id="fcStats"></div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:24px" id="fcStats"></div>
       <!-- Detalhamento -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">
         <div class="card">
           <div class="card-header"><h3>Receitas (Pedidos Concluídos)</h3></div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Data</th><th>Pedido</th><th>Produto</th><th>Valor</th></tr></thead>
+              <thead><tr><th>Data</th><th>Pedido</th><th>Produto</th><th>Valor</th><th>Frete</th></tr></thead>
               <tbody id="fcReceitasTable"></tbody>
             </table>
           </div>
@@ -853,7 +1060,7 @@ textarea { resize: vertical; min-height: 80px; }
   </div><!-- end main-content -->
 <!-- MODAL COMPRA -->
 <div class="modal-overlay" id="modalCompra">
-  <div class="modal">
+  <div class="modal modal-lg">
     <div class="modal-header">
       <h2 id="modalCompraTitle">Nova Compra</h2>
       <button class="btn-close" onclick="closeModal('modalCompra')">✕</button>
@@ -870,32 +1077,22 @@ textarea { resize: vertical; min-height: 80px; }
           <select id="compraFornecedor"><option value="">Selecione...</option></select>
         </div>
         <div class="form-group">
-          <label>Tipo de Item *</label>
-          <select id="compraTipo" onchange="renderCompraItemSelect()">
-            <option value="mp">Matéria-Prima</option>
-            <option value="ins">Insumo / Embalagem</option>
-          </select>
+          <label>Nº Nota Fiscal</label>
+          <input type="text" id="compraNF" placeholder="Opcional">
         </div>
         <div class="form-group">
-          <label>Produto/Material *</label>
-          <select id="compraItem"><option value="">Selecione...</option></select>
+          <label>Observação Geral</label>
+          <input type="text" id="compraObs" placeholder="Opcional">
         </div>
-        <div class="form-group">
-          <label>Quantidade *</label>
-          <input type="number" id="compraQtd" step="0.001" placeholder="0" oninput="calcTotalCompra()">
-        </div>
-        <div class="form-group">
-          <label>Custo Unitário (R$) *</label>
-          <input type="number" id="compraCustoUnit" step="0.01" placeholder="0,00" oninput="calcTotalCompra()">
-        </div>
-        <div class="form-group full">
-          <label>Total da Compra</label>
-          <input type="text" id="compraTotalDisplay" readonly style="background:var(--bege-pale);font-weight:600;color:var(--verde-dark)">
-        </div>
-        <div class="form-group full">
-          <label>Observação</label>
-          <textarea id="compraObs" rows="2"></textarea>
-        </div>
+      </div>
+
+      <div class="section-divider"><span>Itens da Compra</span></div>
+      <div id="compraItensContainer"></div>
+      <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="addCompraItem()">+ Adicionar Item</button>
+
+      <div style="margin-top:16px;text-align:right">
+        <span style="font-size:13px;color:var(--gray-600)">Total Geral: </span>
+        <span id="compraTotalGeral" style="font-size:18px;font-weight:600;color:var(--verde-dark)">R$ 0,00</span>
       </div>
     </div>
     <div class="modal-footer">
@@ -995,9 +1192,9 @@ textarea { resize: vertical; min-height: 80px; }
       <button class="btn btn-secondary btn-sm" onclick="addFornMP()">+ Adicionar Fornecedor</button>
       <div class="section-divider"><span>Fotos</span></div>
       <div class="foto-upload" onclick="document.getElementById('mpFotoInput').click()">
-        <input type="file" id="mpFotoInput" accept="image/*" multiple style="position:absolute;opacity:0;width:100%;height:100%;cursor:pointer" onchange="previewFotos(this,'mpFotosGrid')">
+        <input type="file" id="mpFotoInput" accept="image/*" capture="environment" multiple style="position:absolute;opacity:0;width:100%;height:100%;cursor:pointer" onchange="previewFotos(this,'mpFotosGrid')">
         <div style="font-size:28px">📷</div>
-        <p>Clique ou arraste para adicionar fotos</p>
+        <p>Clique para tirar foto ou escolher da galeria</p>
       </div>
       <div class="fotos-grid" id="mpFotosGrid"></div>
     </div>
@@ -1045,9 +1242,9 @@ textarea { resize: vertical; min-height: 80px; }
       </div>
       <div class="section-divider"><span>Fotos</span></div>
       <div class="foto-upload">
-        <input type="file" id="insFotoInput" accept="image/*" multiple onchange="previewFotos(this,'insFotosGrid')">
+        <input type="file" id="insFotoInput" accept="image/*" capture="environment" multiple onchange="previewFotos(this,'insFotosGrid')">
         <div style="font-size:28px">📷</div>
-        <p>Clique ou arraste para adicionar fotos</p>
+        <p>Clique para tirar foto ou escolher da galeria</p>
       </div>
       <div class="fotos-grid" id="insFotosGrid"></div>
     </div>
@@ -1139,8 +1336,24 @@ textarea { resize: vertical; min-height: 80px; }
       <div id="paItensIns"></div>
       <button class="btn btn-secondary btn-sm" onclick="addItemPA('ins')">+ Adicionar Insumo</button>
 
+      <div class="section-divider"><span>Tempo de Produção</span></div>
+      <div class="form-grid" style="margin-top:8px">
+        <div class="form-group">
+          <label>Tempo Estimado (minutos)</label>
+          <input type="number" id="paTempoProd" step="1" min="0" placeholder="Ex: 45" oninput="calcPA()">
+        </div>
+        <div class="form-group">
+          <label>Custo/Hora vigente</label>
+          <input type="text" id="paCustoHoraDisplay" readonly style="background:var(--bege-pale);color:var(--verde-dark)" placeholder="Cadastre em Custo/Hora">
+        </div>
+        <div class="form-group">
+          <label>Custo de Produção calculado</label>
+          <input type="text" id="paCustoProdDisplay" readonly style="background:var(--bege-pale);font-weight:600;color:var(--verde-dark)">
+        </div>
+      </div>
+
       <div class="section-divider"><span>Precificação</span></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:8px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-top:8px">
         <div class="stat-card">
           <div class="stat-label">Custo de MP</div>
           <div class="stat-value" id="paCustoMP">R$ 0,00</div>
@@ -1149,11 +1362,16 @@ textarea { resize: vertical; min-height: 80px; }
           <div class="stat-label">Custo de Insumos</div>
           <div class="stat-value" id="paCustoIns">R$ 0,00</div>
         </div>
+        <div class="stat-card">
+          <div class="stat-label">Custo de Produção</div>
+          <div class="stat-value" id="paCustoProd">R$ 0,00</div>
+        </div>
         <div class="stat-card" style="background:var(--verde-pale)">
           <div class="stat-label">Custo Total</div>
           <div class="stat-value" id="paCustoTotal">R$ 0,00</div>
         </div>
       </div>
+
       <div class="form-grid" style="margin-top:16px">
         <div class="form-group">
           <label>Markup (multiplicador)</label>
@@ -1167,9 +1385,9 @@ textarea { resize: vertical; min-height: 80px; }
 
       <div class="section-divider"><span>Fotos</span></div>
       <div class="foto-upload">
-        <input type="file" id="paFotoInput" accept="image/*" multiple onchange="previewFotos(this,'paFotosGrid')">
+        <input type="file" id="paFotoInput" accept="image/*" capture="environment" multiple onchange="previewFotos(this,'paFotosGrid')">
         <div style="font-size:28px">📷</div>
-        <p>Clique ou arraste para adicionar fotos</p>
+        <p>Clique para tirar foto ou escolher da galeria</p>
       </div>
       <div class="fotos-grid" id="paFotosGrid"></div>
     </div>
@@ -1232,6 +1450,67 @@ textarea { resize: vertical; min-height: 80px; }
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modalMotivo')">Cancelar</button>
       <button class="btn btn-primary" onclick="saveMotivo()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CUSTO HORA -->
+<div class="modal-overlay" id="modalCustoHora">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalCustoHoraTitle">Nova Vigência de Custo/Hora</h2>
+      <button class="btn-close" onclick="closeModal('modalCustoHora')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="chId">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Vigência De *</label>
+          <input type="date" id="chDe">
+        </div>
+        <div class="form-group">
+          <label>Vigência Até</label>
+          <input type="date" id="chAte" placeholder="Em aberto se vazio">
+        </div>
+        <div class="form-group">
+          <label>Custo / Hora (R$) *</label>
+          <input type="number" id="chValor" step="0.01" placeholder="Ex: 35,00">
+        </div>
+        <div class="form-group">
+          <label>Descrição</label>
+          <input type="text" id="chDesc" placeholder="Ex: Mão de obra artesã">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalCustoHora')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveCustoHora()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CATEGORIA -->
+<div class="modal-overlay" id="modalCategoria">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalCategoriaTitle">Nova Categoria</h2>
+      <button class="btn-close" onclick="closeModal('modalCategoria')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="catId">
+      <input type="hidden" id="catTipo">
+      <div class="form-group" style="margin-bottom:16px">
+        <label>Tipo</label>
+        <input type="text" id="catTipoDisplay" readonly style="background:var(--bege-pale);color:var(--verde-dark)">
+      </div>
+      <div class="form-group">
+        <label>Nome da Categoria *</label>
+        <input type="text" id="catNome" placeholder="Ex: Flores Tropicais">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalCategoria')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveCategoria()">Salvar</button>
     </div>
   </div>
 </div>
@@ -1320,6 +1599,10 @@ textarea { resize: vertical; min-height: 80px; }
           <label>Vendedor *</label>
           <select id="pedVendedor"><option value="">Selecione...</option></select>
         </div>
+        <div class="form-group full">
+          <label>Nome do Cliente</label>
+          <input type="text" id="pedCliente" placeholder="Nome do cliente que fez o pedido">
+        </div>
         <div class="form-group">
           <label>Data de Entrada</label>
           <input type="date" id="pedDataEntrada">
@@ -1351,9 +1634,15 @@ textarea { resize: vertical; min-height: 80px; }
       <div class="form-grid">
         <div class="form-group">
           <label>Tipo de Entrega</label>
-          <select id="pedEntregaTipo">
-            <option>Cliente busca</option><option>Entrega no endereço</option>
+          <select id="pedEntregaTipo" onchange="onEntregaTipoChange()">
+            <option>Cliente busca</option>
+            <option>Entrega no endereço</option>
+            <option>Motoboy</option>
           </select>
+        </div>
+        <div class="form-group" id="pedValorEntregaGrp" style="display:none">
+          <label>Valor do Frete (R$)</label>
+          <input type="number" id="pedValorEntrega" step="0.01" placeholder="0,00">
         </div>
         <div class="form-group">
           <label>Data de Entrega</label>
@@ -1470,28 +1759,39 @@ let db = {
   concluidos: [],
   reprovados: [],
   compras: [],
-  descartes: []
+  descartes: [],
+  custoHora: [],
+  categorias: { mp: ['Flores','Folhagem','Galhos','Outros'], ins: ['Embalagem','Fita','Arame','Esponja','Outros'], pa: ['Buquê','Arranjo','Topiária','Coroa','Outros'] }
 };
 
-let nextId = { forn:1, mp:1, ins:1, pa:1, vend:1, mot:1, usr:1, ped:1, comp:1, desc:1 };
+let nextId = { forn:1, mp:1, ins:1, pa:1, vend:1, mot:1, usr:1, ped:1, comp:1, desc:1, ch:1 };
 let timers = {};
 
 // ============================================================
 //  PERSISTENCE
 // ============================================================
 // ============================================================
-//  PERSISTENCE (SUPABASE)
+//  PERSISTENCE (SUPABASE - PRIMÁRIO)
 // ============================================================
 const SUPABASE_URL = 'https://fypvqrnffeioyrfrqufd.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5cHZxcm5mZmVpb3lyZnJxdWZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MzgxMDgsImV4cCI6MjA5NzMxNDEwOH0.PPrupKW152-baGZq-8rt6dDxE7CwMVkH453nOBcfQ1o';
 const SUPABASE_TABLE = 'sistema_dados';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// Track last known server timestamp to detect external changes
+let _lastServerTimestamp = null;
+// Prevent reentrant reloads
+let _syncing = false;
+// Save queue: if a save is in-flight, queue the next one
+let _savePending = false;
+let _saveInFlight = false;
+
+// ── Local backup (emergency fallback only) ──────────────────
 function saveLocalBackup() {
   try {
     localStorage.setItem('pf_db', JSON.stringify(db));
     localStorage.setItem('pf_ids', JSON.stringify(nextId));
-  } catch (e) { console.error('Falha ao salvar backup local', e); }
+  } catch (e) { console.warn('Backup local falhou:', e); }
 }
 
 function loadLocalBackup() {
@@ -1501,70 +1801,192 @@ function loadLocalBackup() {
   if (i) nextId = JSON.parse(i);
 }
 
-async function save() {
-  saveLocalBackup();
-  try {
-    const savePromise = supabaseClient
-      .from(SUPABASE_TABLE)
-      .upsert({ id: 1, db: db, next_id: nextId, updated_at: new Date().toISOString() }, { onConflict: 'id' });
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('save timeout')), 8000)
-    );
-    const { error } = await Promise.race([savePromise, timeoutPromise]);
-    if (error) console.error('Erro ao salvar no Supabase:', error.message);
-  } catch (e) {
-    console.error('Sem conexão com Supabase, dados mantidos apenas localmente:', e.message);
-  }
-}
-
-async function load() {
-  let carregouRemoto = false;
-  try {
-    const fetchPromise = supabaseClient
-      .from(SUPABASE_TABLE)
-      .select('db, next_id')
-      .eq('id', 1)
-      .maybeSingle();
-    // Timeout de 5 segundos para não travar o login
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Supabase timeout')), 5000)
-    );
-    const { data, error } = await Promise.race([fetchPromise, timeoutPromise]);
-    if (error) {
-      console.error('Erro ao carregar do Supabase:', error.message);
-    } else if (data) {
-      db = data.db || db;
-      nextId = data.next_id || nextId;
-      carregouRemoto = true;
-    }
-  } catch (e) {
-    console.error('Sem conexão com Supabase, usando backup local:', e.message);
-  }
-  if (!carregouRemoto) loadLocalBackup();
+// ── Merge remote data into local state (sem fechar nada) ────
+function applyRemoteData(data) {
+  if (!data) return;
+  db = data.db || db;
+  nextId = data.next_id || nextId;
+  // Garante campos novos
   if (!db.motivosPerda) db.motivosPerda = [];
   if (!db.usuarios) db.usuarios = [];
   if (!db.compras) db.compras = [];
   if (!db.descartes) db.descartes = [];
+  if (!db.custoHora) db.custoHora = [];
+  if (!db.categorias) db.categorias = { mp: ['Flores','Folhagem','Galhos','Outros'], ins: ['Embalagem','Fita','Arame','Esponja','Outros'], pa: ['Buquê','Arranjo','Topiária','Coroa','Outros'] };
+  if (!db.categorias.mp) db.categorias.mp = ['Flores','Folhagem','Galhos','Outros'];
+  if (!db.categorias.ins) db.categorias.ins = ['Embalagem','Fita','Arame','Esponja','Outros'];
+  if (!db.categorias.pa) db.categorias.pa = ['Buquê','Arranjo','Topiária','Coroa','Outros'];
   if (!nextId.mot) nextId.mot = 1;
   if (!nextId.usr) nextId.usr = 1;
   if (!nextId.comp) nextId.comp = 1;
   if (!nextId.desc) nextId.desc = 1;
+  if (!nextId.ch) nextId.ch = 1;
 }
 
-function pingSupabase() {
-  const last = parseInt(localStorage.getItem('pf_supa_last_ping')||'0', 10);
-  const now = Date.now();
-  if (now - last < 4*60*60*1000) return;
-  supabaseClient.from(SUPABASE_TABLE).select('id').limit(1)
-    .then(() => localStorage.setItem('pf_supa_last_ping', String(now)))
-    .catch(() => {});
-}
-setInterval(pingSupabase, 30*60*1000);
+// ── SALVAR: Supabase primeiro, localStorage como fallback ───
+async function save() {
+  // Also save local backup so it stays in sync
+  saveLocalBackup();
+  showSyncStatus('saving');
 
-// Keep-alive: ping a cada 4 minutos para manter conexão com Supabase ativa
-setInterval(() => {
-  supabaseClient.from(SUPABASE_TABLE).select('id').limit(1).catch(() => {});
-}, 4 * 60 * 1000);
+  if (_saveInFlight) {
+    // Another save is running — mark pending and return
+    _savePending = true;
+    return;
+  }
+  _saveInFlight = true;
+  _savePending = false;
+
+  const payload = {
+    id: 1,
+    db: db,
+    next_id: nextId,
+    updated_at: new Date().toISOString()
+  };
+
+  try {
+    const { error, data } = await supabaseClient
+      .from(SUPABASE_TABLE)
+      .upsert(payload, { onConflict: 'id' })
+      .select('updated_at')
+      .single();
+
+    if (error) {
+      console.error('Erro ao salvar no Supabase:', error.message);
+      showSyncStatus('erro');
+    } else {
+      _lastServerTimestamp = data?.updated_at || payload.updated_at;
+      showSyncStatus('ok');
+    }
+  } catch (e) {
+    console.error('Falha na conexão Supabase:', e.message);
+    showSyncStatus('erro');
+  } finally {
+    _saveInFlight = false;
+    // If a new save was requested while we were saving, flush it now
+    if (_savePending) {
+      _savePending = false;
+      setTimeout(save, 100);
+    }
+  }
+}
+
+// ── CARREGAR: Supabase primeiro ──────────────────────────────
+async function load() {
+  let carregouRemoto = false;
+  try {
+    const { data, error } = await Promise.race([
+      supabaseClient.from(SUPABASE_TABLE).select('db, next_id, updated_at').eq('id', 1).maybeSingle(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000))
+    ]);
+    if (error) {
+      console.error('Erro ao carregar do Supabase:', error.message);
+    } else if (data) {
+      applyRemoteData(data);
+      _lastServerTimestamp = data.updated_at || null;
+      carregouRemoto = true;
+    }
+  } catch (e) {
+    console.warn('Supabase indisponível, carregando backup local:', e.message);
+  }
+  if (!carregouRemoto) {
+    loadLocalBackup();
+    applyRemoteData({ db, next_id: nextId }); // ensure fields exist
+  }
+}
+
+// ── POLLING: detecta alterações de outros usuários ──────────
+// Supabase Realtime não é garantido no plano free com anonymous key.
+// Usamos polling leve a cada 15s para verificar se o updated_at mudou.
+let _pollInterval = null;
+
+function startPolling() {
+  if (_pollInterval) return;
+  _pollInterval = setInterval(async () => {
+    if (_saveInFlight) return; // não recarregar enquanto estamos salvando
+    try {
+      const { data, error } = await supabaseClient
+        .from(SUPABASE_TABLE)
+        .select('updated_at, db, next_id')
+        .eq('id', 1)
+        .maybeSingle();
+
+      if (error || !data) return;
+
+      // Se o timestamp do servidor é mais recente que o que conhecemos → outro usuário salvou
+      if (_lastServerTimestamp && data.updated_at > _lastServerTimestamp) {
+        console.log('🔄 Novos dados detectados, sincronizando...');
+        applyRemoteData(data);
+        saveLocalBackup();
+        _lastServerTimestamp = data.updated_at;
+        // Re-renderiza a tela ativa sem fechar modais
+        reRenderCurrentScreen();
+        showSyncStatus('sync');
+      }
+    } catch (e) {
+      // silencioso — não interrompe o usuário
+    }
+  }, 15000); // a cada 15 segundos
+}
+
+// ── KEEP-ALIVE: evita que o Supabase "pause" a conexão ──────
+// Faz um select mínimo a cada 2 minutos para manter o canal ativo
+let _keepAliveInterval = null;
+
+function startKeepAlive() {
+  if (_keepAliveInterval) return;
+  _keepAliveInterval = setInterval(() => {
+    supabaseClient
+      .from(SUPABASE_TABLE)
+      .select('id')
+      .limit(1)
+      .then(() => {})
+      .catch(() => {});
+  }, 2 * 60 * 1000); // a cada 2 minutos
+}
+
+// ── Re-renderiza a tela ativa (sync de outros usuários) ─────
+function reRenderCurrentScreen() {
+  const activeScreen = document.querySelector('.screen.active');
+  if (!activeScreen) return;
+  const id = activeScreen.id.replace('screen-', '');
+  try {
+    if (id === 'dashboard') renderDashboard();
+    else if (id === 'pedidos') renderPedidos();
+    else if (id === 'aguardando') renderAguardando();
+    else if (id === 'cobranca') renderCobranca();
+    else if (id === 'concluidos') renderConcluidos();
+    else if (id === 'reprovados') renderReprovados();
+    else if (id === 'compras') renderCompras();
+    else if (id === 'estoque') { renderEstoqueFiltProduto(); renderEstoque(); }
+    else if (id === 'fluxocaixa') renderFluxoCaixa();
+    else if (id === 'prodacabado') renderPA();
+    else if (id === 'materiaprima') renderMP();
+    else if (id === 'insumos') renderInsumos();
+    else if (id === 'fornecedores') renderForn();
+    else if (id === 'tabprecos') renderTabPrecos();
+    else if (id === 'custohora') renderCustoHora();
+    else if (id === 'usuarios') renderUsuarios();
+    updateBadges();
+  } catch(e) { /* silencioso */ }
+}
+
+// ── Indicador visual de sincronização ───────────────────────
+function showSyncStatus(status) {
+  const el = document.getElementById('syncIndicator');
+  if (!el) return;
+  const msgs = {
+    ok:   { icon:'☁️', text:'Salvo', color:'var(--success)' },
+    erro: { icon:'⚠️', text:'Offline', color:'var(--warning)' },
+    sync: { icon:'🔄', text:'Atualizado', color:'var(--info)' },
+    saving:{ icon:'💾', text:'Salvando...', color:'var(--gray-400)' }
+  };
+  const s = msgs[status] || msgs.ok;
+  el.innerHTML = `<span style="color:${s.color};font-size:12px">${s.icon} ${s.text}</span>`;
+  // Auto-apaga após 3s
+  clearTimeout(el._timeout);
+  el._timeout = setTimeout(() => { el.innerHTML = ''; }, 3000);
+}
 
 // ============================================================
 //  AUTH
@@ -1585,7 +2007,9 @@ const TELAS_DISPONIVEIS = [
   {id:'motivosperda', label:'Motivos de Perda'},
   {id:'compras', label:'Compras'},
   {id:'estoque', label:'Estoque'},
-  {id:'fluxocaixa', label:'Fluxo de Caixa'}
+  {id:'fluxocaixa', label:'Fluxo de Caixa'},
+  {id:'custohora', label:'Custo / Hora'},
+  {id:'categorias', label:'Categorias'}
 ];
 
 function userDisplay(u) {
@@ -1696,6 +2120,8 @@ function showScreen(id) {
   if (id === 'compras') renderCompras();
   if (id === 'estoque') { renderEstoqueFiltProduto(); renderEstoque(); }
   if (id === 'fluxocaixa') renderFluxoCaixa();
+  if (id === 'custohora') renderCustoHora();
+  if (id === 'categorias') renderCategorias();
 }
 
 // ============================================================
@@ -1704,9 +2130,26 @@ function showScreen(id) {
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
-// click outside to close
+// click outside to close - use mousedown+mouseup to avoid scroll triggers
 document.querySelectorAll('.modal-overlay').forEach(o => {
-  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+  let mousedownOnOverlay = false;
+  o.addEventListener('mousedown', e => { mousedownOnOverlay = (e.target === o); });
+  o.addEventListener('mouseup', e => {
+    if (mousedownOnOverlay && e.target === o) o.classList.remove('open');
+    mousedownOnOverlay = false;
+  });
+  // touch: only close if touch started and ended on overlay, not on scroll
+  let touchStartY = 0;
+  o.addEventListener('touchstart', e => {
+    mousedownOnOverlay = (e.target === o);
+    touchStartY = e.touches[0]?.clientY || 0;
+  }, { passive: true });
+  o.addEventListener('touchend', e => {
+    const touchEndY = e.changedTouches[0]?.clientY || 0;
+    const scrolled = Math.abs(touchEndY - touchStartY) > 10;
+    if (mousedownOnOverlay && e.target === o && !scrolled) o.classList.remove('open');
+    mousedownOnOverlay = false;
+  });
 });
 
 // ============================================================
@@ -1882,6 +2325,8 @@ function editMP(id) {
     last.querySelector('input').value = f.custo;
   });
   document.getElementById('modalMPTitle').textContent = 'Editar Matéria-Prima';
+  refreshCategoriaSelects();
+  document.getElementById('mpCategoria').value = m.categoria;
   openModal('modalMP');
 }
 
@@ -1939,6 +2384,8 @@ function editIns(id) {
   document.getElementById('insFornecedor').value = m.fornId||'';
   document.getElementById('insFotosGrid').innerHTML = m.fotos?.map(f=>`<img class="foto-thumb" src="${f}">`).join('')||'';
   document.getElementById('modalInsumoTitle').textContent = 'Editar Insumo';
+  refreshCategoriaSelects();
+  document.getElementById('insCategoria').value = m.categoria;
   openModal('modalInsumo');
 }
 
@@ -2010,12 +2457,23 @@ function calcPA() {
     if (costEl) costEl.textContent = fmt(c);
   });
 
-  const total = custoMP + custoIns;
+  // Custo de produção: tempo (min) * custo hora vigente / 60
+  const tempMin = parseFloat(document.getElementById('paTempoProd')?.value)||0;
+  const custoHoraVig = getCustoHoraVigente();
+  const custoProd = tempMin > 0 && custoHoraVig > 0 ? (tempMin / 60) * custoHoraVig : 0;
+
+  const chDisp = document.getElementById('paCustoHoraDisplay');
+  const cpDisp = document.getElementById('paCustoProdDisplay');
+  if (chDisp) chDisp.value = custoHoraVig > 0 ? fmt(custoHoraVig)+'/h' : 'Sem cadastro';
+  if (cpDisp) cpDisp.value = fmt(custoProd);
+
+  const total = custoMP + custoIns + custoProd;
   const markup = parseFloat(document.getElementById('paMarkup').value) || 1;
   document.getElementById('paCustoMP').textContent = fmt(custoMP);
   document.getElementById('paCustoIns').textContent = fmt(custoIns);
+  document.getElementById('paCustoProd').textContent = fmt(custoProd);
   document.getElementById('paCustoTotal').textContent = fmt(total);
-  // Atualiza o preço sugerido pelo markup (usuário pode sobrescrever manualmente)
+  // Atualiza o preço sugerido pelo markup
   document.getElementById('paPrecoVenda').value = (total * markup).toFixed(2);
 }
 
@@ -2035,14 +2493,17 @@ function savePA() {
   const id = document.getElementById('paId').value;
   const markup = parseFloat(document.getElementById('paMarkup').value) || 1;
   const itens = getPAItens();
+  const tempoProd = parseFloat(document.getElementById('paTempoProd')?.value)||0;
+  const custoHoraVig = getCustoHoraVigente();
+  const custoProd = tempoProd > 0 && custoHoraVig > 0 ? (tempoProd/60)*custoHoraVig : 0;
 
   let custoTotal = 0;
   itens.forEach(i => {
     if (i.type==='mp') { const x=db.mp.find(m=>m.id==i.itemId); custoTotal += (x?.custoMedio||0)*i.qtd; }
     else { const x=db.insumos.find(m=>m.id==i.itemId); custoTotal += (x?.custo||0)*i.qtd; }
   });
+  custoTotal += custoProd;
 
-  // Usa o preço digitado manualmente; se vazio, calcula pelo markup
   const precoDigitado = parseFloat(document.getElementById('paPrecoVenda').value);
   const precoVenda = (!isNaN(precoDigitado) && precoDigitado > 0) ? precoDigitado : custoTotal * markup;
 
@@ -2052,6 +2513,7 @@ function savePA() {
     categoria: document.getElementById('paCategoria').value,
     desc: document.getElementById('paDesc').value,
     itens, markup, custoTotal,
+    tempoProd, custoProd,
     precoVenda,
     fotos: getGridFotos('paFotosGrid')
   };
@@ -2068,6 +2530,7 @@ function editPA(id) {
   document.getElementById('paCategoria').value = p.categoria;
   document.getElementById('paDesc').value = p.desc||'';
   document.getElementById('paMarkup').value = p.markup||2.5;
+  document.getElementById('paTempoProd').value = p.tempoProd||0;
   document.getElementById('paItensMP').innerHTML = '';
   document.getElementById('paItensIns').innerHTML = '';
   document.getElementById('paFotosGrid').innerHTML = p.fotos?.map(f=>`<img class="foto-thumb" src="${f}">`).join('')||'';
@@ -2079,9 +2542,10 @@ function editPA(id) {
     last.querySelector('input').value = item.qtd;
   });
   calcPA();
-  // Restaura o preço de venda salvo (pode ter sido editado manualmente)
   document.getElementById('paPrecoVenda').value = p.precoVenda ? p.precoVenda.toFixed(2) : '';
   document.getElementById('modalPATitle').textContent = 'Editar Produto';
+  refreshCategoriaSelects();
+  document.getElementById('paCategoria').value = p.categoria;
   openModal('modalPA');
 }
 
@@ -2373,9 +2837,10 @@ function pedOnProduto() {
 function openNovoPedido() {
   document.getElementById('pedId').value = '';
   document.getElementById('pedDataEntrada').value = today();
-  ['pedProduto','pedVendedor','pedDestinatario','pedTelContato','pedEndereco','pedObs','pedMotivoRep','pedObsRep','pedDataEntrega','pedHoraEntrega'].forEach(id => {
+  ['pedProduto','pedVendedor','pedCliente','pedDestinatario','pedTelContato','pedEndereco','pedObs','pedMotivoRep','pedObsRep','pedDataEntrega','pedHoraEntrega','pedValorEntrega'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
+  onEntregaTipoChange();
   renderMotivoRepSelect();
   document.getElementById('pedStatus').value = 'Em andamento';
   document.getElementById('pedCompMP').style.display = 'none';
@@ -2404,10 +2869,12 @@ function savePedido() {
     produtoFoto: pa?.fotos?.[0] || '',
     vendedorId: document.getElementById('pedVendedor').value,
     vendedorNome: db.vendedores.find(v=>v.id==document.getElementById('pedVendedor').value)?.nome || '',
+    cliente: document.getElementById('pedCliente').value,
     valor: parseFloat(document.getElementById('pedValor').value)||0,
     dataEntrada: document.getElementById('pedDataEntrada').value,
     dataPrev: document.getElementById('pedDataPrev').value,
     entregaTipo: document.getElementById('pedEntregaTipo').value,
+    valorEntrega: parseFloat(document.getElementById('pedValorEntrega')?.value)||0,
     dataEntregaProgramada: document.getElementById('pedDataEntrega').value,
     horaEntregaProgramada: document.getElementById('pedHoraEntrega').value,
     destinatario: document.getElementById('pedDestinatario').value,
@@ -2488,7 +2955,7 @@ function renderPedidos() {
     return `<tr>
       <td><span class="badge badge-gray">#${p.numero||p.id}</span></td>
       <td>${p.produtoFoto?`<img src="${p.produtoFoto}" style="width:32px;height:32px;border-radius:4px;object-fit:cover;margin-right:6px;vertical-align:middle">`:''}${p.produtoNome}</td>
-      <td>${p.destinatario||'-'}</td>
+      <td>${p.cliente||p.destinatario||'-'}</td>
       <td>${p.vendedorNome||'-'}</td>
       <td><span class="price">${fmt(p.valor)}</span></td>
       <td>${fmtDate(p.dataEntrada)}</td>
@@ -2509,7 +2976,7 @@ function renderPedidos() {
       <td>
         <button class="btn btn-secondary btn-sm" onclick="editPedido(${p.id})">✏️</button>
         <button class="btn btn-secondary btn-sm" onclick="gerarOrcamento(${p.id},'pedidos')" title="Gerar Orçamento PDF">🧾</button>
-        ${p.entregaTipo==='Entrega no endereço'?`<button class="btn btn-secondary btn-sm" onclick="gerarDocumentoMotoboy(${p.id},'pedidos')" title="Documento para Motoboy">🛵</button>`:''}
+        ${p.entregaTipo==='Entrega no endereço'||p.entregaTipo==='Motoboy'?`<button class="btn btn-secondary btn-sm" onclick="gerarDocumentoMotoboy(${p.id},'pedidos')" title="Documento para Motoboy">🛵</button>`:''}
         <button class="btn btn-warning btn-sm" onclick="moverAguardando(${p.id})">🚚 Entrega</button>
         <button class="btn btn-danger btn-sm" onclick="reprovarPedido(${p.id})">❌</button>
       </td>
@@ -2528,6 +2995,9 @@ function editPedido(id) {
   document.getElementById('pedDataEntrega').value = p.dataEntregaProgramada||'';
   document.getElementById('pedHoraEntrega').value = p.horaEntregaProgramada||'';
   document.getElementById('pedDestinatario').value = p.destinatario||'';
+  document.getElementById('pedCliente').value = p.cliente||'';
+  document.getElementById('pedValorEntrega').value = p.valorEntrega||0;
+  onEntregaTipoChange();
   document.getElementById('pedTelContato').value = p.telContato||'';
   document.getElementById('pedEndereco').value = p.endereco||'';
   document.getElementById('pedObs').value = p.obs||'';
@@ -2720,7 +3190,7 @@ function renderAguardando() {
       <td>
         ${p.followUp==='Entregue'?`<button class="btn btn-success btn-sm" onclick="moverCobranca(${p.id})">💰 Cobrar</button>`:''}
         <button class="btn btn-secondary btn-sm" onclick="gerarOrcamento(${p.id},'aguardando')" title="Gerar Orçamento PDF">🧾</button>
-        ${p.entregaTipo==='Entrega no endereço'?`<button class="btn btn-secondary btn-sm" onclick="gerarDocumentoMotoboy(${p.id},'aguardando')" title="Documento para Motoboy">🛵</button>`:''}
+        ${p.entregaTipo==='Entrega no endereço'||p.entregaTipo==='Motoboy'?`<button class="btn btn-secondary btn-sm" onclick="gerarDocumentoMotoboy(${p.id},'aguardando')" title="Documento para Motoboy">🛵</button>`:''}
         <button class="btn btn-secondary btn-sm" onclick="reverterAguardando(${p.id})">↩️ Reverter</button>
       </td>
     </tr>`;
@@ -2860,9 +3330,40 @@ function updateBadges() {
 // ============================================================
 //  DASHBOARD
 // ============================================================
+function limparFiltrosDash() {
+  document.getElementById('dashAno').value = '';
+  document.getElementById('dashMes').value = '';
+  renderDashboard();
+}
+
+function populateDashAnoSelect() {
+  const sel = document.getElementById('dashAno');
+  if (!sel) return;
+  const anos = new Set();
+  [...db.concluidos,...db.aguardando,...db.pedidos,...db.cobranca].forEach(p => {
+    const d = p.dataConclusao||p.dataEntrega||p.dataEntrada||'';
+    if (d) anos.add(d.slice(0,4));
+  });
+  const sorted = [...anos].sort().reverse();
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">Todos anos</option>' + sorted.map(y=>`<option value="${y}" ${y===cur?'selected':''}>${y}</option>`).join('');
+}
+
 function renderDashboard() {
-  const allDone = [...db.concluidos];
+  populateDashAnoSelect();
+  const filtAno = document.getElementById('dashAno')?.value||'';
+  const filtMes = document.getElementById('dashMes')?.value||'';
+
+  function matchDashFiltro(p) {
+    const d = p.dataConclusao||p.dataEntrega||p.dataEntrada||'';
+    if (filtAno && d.slice(0,4)!==filtAno) return false;
+    if (filtMes && d.slice(5,7)!==filtMes) return false;
+    return true;
+  }
+
+  const allDone = db.concluidos.filter(matchDashFiltro);
   const total = allDone.reduce((a,p)=>a+p.valor,0);
+  const totalEntrega = allDone.reduce((a,p)=>a+(parseFloat(p.valorEntrega)||0),0);
   const qtd = allDone.length;
   const emAberto = db.pedidos.length + db.aguardando.length + db.cobranca.length;
   const aReceber = db.cobranca.reduce((a,p)=>a+p.valor,0);
@@ -2870,30 +3371,45 @@ function renderDashboard() {
   document.getElementById('dashStats').innerHTML = `
     <div class="stat-card"><div class="stat-label">Total Concluídos</div><div class="stat-value">${qtd}</div><div class="stat-sub">pedidos entregues e pagos</div></div>
     <div class="stat-card" style="border-left:3px solid var(--verde)"><div class="stat-label">Receita Concluída</div><div class="stat-value">${fmt(total)}</div><div class="stat-sub">total recebido</div></div>
+    <div class="stat-card" style="border-left:3px solid var(--info)"><div class="stat-label">Receita de Frete</div><div class="stat-value">${fmt(totalEntrega)}</div><div class="stat-sub">motoboy + endereço</div></div>
     <div class="stat-card"><div class="stat-label">Em Aberto</div><div class="stat-value">${emAberto}</div><div class="stat-sub">pedidos ativos</div></div>
     <div class="stat-card" style="border-left:3px solid var(--warning)"><div class="stat-label">A Receber</div><div class="stat-value">${fmt(aReceber)}</div><div class="stat-sub">cobrança pendente</div></div>
   `;
 
-  // Chart by month
+  // Chart by month (last 6 or filtered year)
   const months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
   const currentMonth = new Date().getMonth();
-  const lastSix = [];
-  for (let i=5;i>=0;i--) {
-    const m = (currentMonth-i+12)%12;
-    const year = new Date().getFullYear() - (currentMonth-i<0?1:0);
-    const label = months[m];
-    const pedsMes = allDone.filter(p => {
-      if (!p.dataConclusao) return false;
-      const d = new Date(p.dataConclusao);
-      return d.getMonth()===m;
-    });
-    lastSix.push({ label, qtd:pedsMes.length, val:pedsMes.reduce((a,p)=>a+p.valor,0) });
+  const currentYear = new Date().getFullYear();
+  let chartData = [];
+
+  if (filtAno) {
+    // show all 12 months of selected year
+    for (let m=0; m<12; m++) {
+      const mm = String(m+1).padStart(2,'0');
+      const peds = db.concluidos.filter(p=>{
+        const d=p.dataConclusao||'';
+        return d.slice(0,4)===filtAno && d.slice(5,7)===mm && (!filtMes||mm===filtMes);
+      });
+      chartData.push({ label:months[m], qtd:peds.length, val:peds.reduce((a,p)=>a+p.valor,0) });
+    }
+  } else {
+    for (let i=5;i>=0;i--) {
+      const m = (currentMonth-i+12)%12;
+      const year = currentYear - (currentMonth-i<0?1:0);
+      const mm = String(m+1).padStart(2,'0');
+      const yy = String(year);
+      const peds = db.concluidos.filter(p=>{
+        const d=p.dataConclusao||'';
+        return d.slice(0,4)===yy && d.slice(5,7)===mm;
+      });
+      chartData.push({ label:months[m], qtd:peds.length, val:peds.reduce((a,p)=>a+p.valor,0) });
+    }
   }
 
-  const maxQtd = Math.max(...lastSix.map(x=>x.qtd), 1);
-  const maxVal = Math.max(...lastSix.map(x=>x.val), 1);
+  const maxQtd = Math.max(...chartData.map(x=>x.qtd), 1);
+  const maxVal = Math.max(...chartData.map(x=>x.val), 1);
 
-  document.getElementById('dashChartQtd').innerHTML = lastSix.map(x => `
+  document.getElementById('dashChartQtd').innerHTML = chartData.map(x => `
     <div class="bar-col">
       <div class="bar-val">${x.qtd}</div>
       <div class="bar" style="height:${Math.round(x.qtd/maxQtd*120)+10}px"></div>
@@ -2901,7 +3417,7 @@ function renderDashboard() {
     </div>
   `).join('');
 
-  document.getElementById('dashChartVal').innerHTML = lastSix.map(x => `
+  document.getElementById('dashChartVal').innerHTML = chartData.map(x => `
     <div class="bar-col">
       <div class="bar-val" style="font-size:10px">R$${(x.val/1000).toFixed(1)}k</div>
       <div class="bar" style="height:${Math.round(x.val/maxVal*120)+10}px;background:var(--bege-dark)"></div>
@@ -2909,12 +3425,45 @@ function renderDashboard() {
     </div>
   `).join('');
 
+  // Delivery type chart
+  const allPeds = [...db.concluidos, ...db.aguardando, ...db.cobranca, ...db.pedidos].filter(matchDashFiltro);
+  const tiposEntrega = {
+    'Cliente busca': { cor:'var(--verde)', count:0 },
+    'Entrega no endereço': { cor:'var(--info)', count:0 },
+    'Motoboy': { cor:'var(--warning)', count:0 }
+  };
+  allPeds.forEach(p => {
+    const t = p.entregaTipo||'Cliente busca';
+    if (tiposEntrega[t]) tiposEntrega[t].count++;
+    else tiposEntrega['Cliente busca'].count++;
+  });
+  const maxT = Math.max(...Object.values(tiposEntrega).map(x=>x.count), 1);
+  const barChartH = 160;
+  const grafEl = document.getElementById('dashEntregaChart');
+  if (grafEl) {
+    grafEl.innerHTML = Object.entries(tiposEntrega).map(([label, data]) => {
+      const barH = data.count > 0 ? Math.max(Math.round(data.count / maxT * barChartH), 12) : 4;
+      return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0">
+        <div style="font-size:18px;font-weight:700;color:var(--verde-dark);margin-bottom:6px">${data.count}</div>
+        <div style="width:80%;background:${data.cor};border-radius:8px 8px 0 0;height:${barH}px"></div>
+        <div style="font-size:12px;color:var(--gray-600);text-align:center;margin-top:8px;line-height:1.4">${label}</div>
+      </div>`;
+    }).join('');
+  }
+  const legEl = document.getElementById('dashEntregaLegend');
+  if (legEl) {
+    legEl.innerHTML = Object.entries(tiposEntrega).map(([label, data]) =>
+      `<span style="display:flex;align-items:center;gap:6px"><span style="width:14px;height:14px;background:${data.cor};display:inline-block;border-radius:3px;flex-shrink:0"></span>${label}: <strong>${data.count}</strong></span>`
+    ).join('');
+  }
+
   const tbody = document.getElementById('dashTableBody');
-  tbody.innerHTML = db.concluidos.slice(-10).reverse().map(p => `
+  const filtrados = filtAno||filtMes ? allDone : db.concluidos.slice(-10).reverse();
+  tbody.innerHTML = (filtAno||filtMes ? filtrados.slice(0,10) : filtrados).map(p => `
     <tr>
       <td><span class="badge badge-gray">#${p.numero||p.id}</span></td>
       <td>${p.produtoNome}</td>
-      <td>${p.destinatario||'-'}</td>
+      <td>${p.cliente||p.destinatario||'-'}</td>
       <td>${p.vendedorNome||'-'}</td>
       <td><span class="price">${fmt(p.valor)}</span></td>
       <td>${fmtDate(p.dataConclusao)}</td>
@@ -2932,6 +3481,9 @@ function renderAll() {
   renderPedidos(); renderAguardando(); renderCobranca();
   renderConcluidos(); renderReprovados();
   renderCompras();
+  renderCustoHora();
+  renderCategorias();
+  refreshCategoriaSelects();
   renderDashboard(); updateBadges();
 }
 
@@ -2981,76 +3533,158 @@ async function initApp() {
   aplicarCredenciaisLembradas();
   document.getElementById('loginLoading').style.display = 'none';
   document.getElementById('loginCardContent').style.display = 'block';
-  pingSupabase();
+  // Inicia keep-alive e polling de sincronização
+  startKeepAlive();
+  startPolling();
 }
 // ============================================================
 //  COMPRAS
 // ============================================================
+let compraItemCounter = 0;
+
+function addCompraItem() {
+  const id = compraItemCounter++;
+  const container = document.getElementById('compraItensContainer');
+  const div = document.createElement('div');
+  div.className = 'compra-item-row';
+  div.id = 'cItem_' + id;
+
+  const mpOpts = db.mp.map(x=>`<option value="mp_${x.id}">${x.nome} (${x.unidade||'un'})</option>`).join('');
+  const insOpts = db.insumos.map(x=>`<option value="ins_${x.id}">${x.nome} (${x.unidade||'un'})</option>`).join('');
+
+  div.innerHTML = `
+    <div class="compra-item-col">
+      <label>Tipo</label>
+      <select onchange="updateCompraItem(${id})" id="cTipo_${id}">
+        <optgroup label="Matéria-Prima">${mpOpts}</optgroup>
+        <optgroup label="Insumo / Embalagem">${insOpts}</optgroup>
+      </select>
+    </div>
+    <div class="compra-item-col" style="display:none"><!-- spacer desktop --></div>
+    <div class="compra-item-col">
+      <label>Quantidade *</label>
+      <input type="number" id="cQtd_${id}" step="0.001" placeholder="0" oninput="calcCompraItemTotal(${id})">
+    </div>
+    <div class="compra-item-col">
+      <label>Custo Unit. (R$) *</label>
+      <input type="number" id="cCusto_${id}" step="0.01" placeholder="0,00" oninput="calcCompraItemTotal(${id})">
+    </div>
+    <div class="compra-item-col">
+      <label>Total</label>
+      <input type="text" id="cTotal_${id}" readonly style="background:var(--bege-pale);font-weight:600;color:var(--verde-dark)">
+    </div>
+    <div style="display:flex;align-items:flex-end;padding-bottom:2px">
+      <button onclick="removeCompraItem(${id})" style="background:var(--danger-light);border:none;border-radius:6px;cursor:pointer;padding:8px 10px;color:var(--danger)">✕</button>
+    </div>
+  `;
+  container.appendChild(div);
+  calcCompraTotalGeral();
+}
+
+function removeCompraItem(id) {
+  const el = document.getElementById('cItem_' + id);
+  if (el) el.remove();
+  calcCompraTotalGeral();
+}
+
+function updateCompraItem(id) {
+  calcCompraItemTotal(id);
+}
+
+function calcCompraItemTotal(id) {
+  const qtd = parseFloat(document.getElementById('cQtd_'+id)?.value)||0;
+  const cu = parseFloat(document.getElementById('cCusto_'+id)?.value)||0;
+  const el = document.getElementById('cTotal_'+id);
+  if (el) el.value = fmt(qtd*cu);
+  calcCompraTotalGeral();
+}
+
+function calcCompraTotalGeral() {
+  let total = 0;
+  document.querySelectorAll('#compraItensContainer .compra-item-row').forEach(row => {
+    const idMatch = row.id.match(/cItem_(\d+)/);
+    if (!idMatch) return;
+    const id = idMatch[1];
+    const qtd = parseFloat(document.getElementById('cQtd_'+id)?.value)||0;
+    const cu = parseFloat(document.getElementById('cCusto_'+id)?.value)||0;
+    total += qtd*cu;
+  });
+  const el = document.getElementById('compraTotalGeral');
+  if (el) el.textContent = fmt(total);
+}
+
 function openNovaCompra() {
   document.getElementById('compraId').value = '';
   document.getElementById('compraData').value = today();
   document.getElementById('compraObs').value = '';
-  document.getElementById('compraQtd').value = '';
-  document.getElementById('compraCustoUnit').value = '';
-  document.getElementById('compraTotalDisplay').value = '';
-  document.getElementById('compraTipo').value = 'mp';
-  // Populate fornecedor select
+  document.getElementById('compraNF').value = '';
+  document.getElementById('compraItensContainer').innerHTML = '';
+  compraItemCounter = 0;
   const fOpts = db.fornecedores.map(f=>`<option value="${f.id}">${f.nome}</option>`).join('');
   document.getElementById('compraFornecedor').innerHTML = '<option value="">Selecione...</option>' + fOpts;
-  renderCompraItemSelect();
   document.getElementById('modalCompraTitle').textContent = 'Nova Compra';
+  addCompraItem(); // start with one item
   openModal('modalCompra');
 }
 
-function renderCompraItemSelect() {
-  const tipo = document.getElementById('compraTipo').value;
-  const lista = tipo === 'mp' ? db.mp : db.insumos;
-  const opts = lista.map(x=>`<option value="${x.id}">${x.nome} (${x.unidade||'un'})</option>`).join('');
-  document.getElementById('compraItem').innerHTML = '<option value="">Selecione...</option>' + opts;
-}
-
-function calcTotalCompra() {
-  const qtd = parseFloat(document.getElementById('compraQtd').value)||0;
-  const cu = parseFloat(document.getElementById('compraCustoUnit').value)||0;
-  document.getElementById('compraTotalDisplay').value = fmt(qtd*cu);
-}
+function renderCompraItemSelect() { /* kept for compat */ }
+function calcTotalCompra() { /* kept for compat */ }
 
 function saveCompra() {
   const id = document.getElementById('compraId').value;
   const fornId = document.getElementById('compraFornecedor').value;
-  const tipo = document.getElementById('compraTipo').value;
-  const itemId = parseInt(document.getElementById('compraItem').value);
-  const qtd = parseFloat(document.getElementById('compraQtd').value)||0;
-  const custoUnit = parseFloat(document.getElementById('compraCustoUnit').value)||0;
   const data = document.getElementById('compraData').value;
+  const nf = document.getElementById('compraNF').value;
+  const obs = document.getElementById('compraObs').value;
 
   if (!fornId) { alert('Selecione o fornecedor'); return; }
-  if (!itemId) { alert('Selecione o produto/material'); return; }
-  if (qtd <= 0) { alert('Informe a quantidade'); return; }
-  if (custoUnit <= 0) { alert('Informe o custo unitário'); return; }
   if (!data) { alert('Informe a data da compra'); return; }
 
-  const lista = tipo === 'mp' ? db.mp : db.insumos;
-  const item = lista.find(x=>x.id==itemId);
   const forn = db.fornecedores.find(f=>f.id==fornId);
+  const rows = document.querySelectorAll('#compraItensContainer .compra-item-row');
 
-  const obj = {
-    id: id || (nextId.comp++),
-    data, fornId, fornNome: forn?.nome||'', tipo, itemId,
-    itemNome: item?.nome||'', itemUnidade: item?.unidade||'un',
-    qtd, custoUnit, total: qtd*custoUnit,
-    obs: document.getElementById('compraObs').value
-  };
+  if (rows.length === 0) { alert('Adicione pelo menos um item'); return; }
+
+  const itens = [];
+  let valid = true;
+  rows.forEach(row => {
+    const idMatch = row.id.match(/cItem_(\d+)/);
+    if (!idMatch) return;
+    const cid = idMatch[1];
+    const tipoVal = document.getElementById('cTipo_'+cid)?.value || '';
+    const qtd = parseFloat(document.getElementById('cQtd_'+cid)?.value)||0;
+    const custoUnit = parseFloat(document.getElementById('cCusto_'+cid)?.value)||0;
+    if (!tipoVal) { alert('Selecione o produto/material em todos os itens'); valid=false; return; }
+    if (qtd <= 0) { alert('Informe a quantidade em todos os itens'); valid=false; return; }
+    if (custoUnit <= 0) { alert('Informe o custo unitário em todos os itens'); valid=false; return; }
+    const [tipo, itemIdStr] = tipoVal.split('_');
+    const itemId = parseInt(itemIdStr);
+    const lista = tipo === 'mp' ? db.mp : db.insumos;
+    const item = lista.find(x=>x.id==itemId);
+    itens.push({ tipo, itemId, itemNome: item?.nome||'', itemUnidade: item?.unidade||'un', qtd, custoUnit, total: qtd*custoUnit });
+  });
+
+  if (!valid) return;
 
   if (id) {
-    const i = db.compras.findIndex(x=>x.id==id);
-    db.compras[i] = obj;
-  } else {
-    db.compras.push(obj);
+    // Edit mode: replace all compras with this id prefix
+    db.compras = db.compras.filter(x=>x.compraGrupoId != id);
   }
 
-  // Atualiza custo médio do item
-  atualizarCustoMedio(tipo, itemId);
+  const grupoId = id || String(nextId.comp++);
+
+  itens.forEach((it, idx) => {
+    const obj = {
+      id: idx === 0 && !id ? grupoId : String(nextId.comp++),
+      compraGrupoId: grupoId,
+      data, fornId, fornNome: forn?.nome||'', nf, obs,
+      tipo: it.tipo, itemId: it.itemId,
+      itemNome: it.itemNome, itemUnidade: it.itemUnidade,
+      qtd: it.qtd, custoUnit: it.custoUnit, total: it.total
+    };
+    db.compras.push(obj);
+    atualizarCustoMedio(it.tipo, it.itemId);
+  });
 
   save(); closeModal('modalCompra'); renderCompras();
   if (document.getElementById('screen-estoque').classList.contains('active')) renderEstoque();
@@ -3073,27 +3707,52 @@ function atualizarCustoMedio(tipo, itemId) {
 }
 
 function editCompra(id) {
+  // Find all items with this compra id (could be a group)
   const c = db.compras.find(x=>x.id==id);
-  document.getElementById('compraId').value = c.id;
+  if (!c) return;
+
+  document.getElementById('compraId').value = c.compraGrupoId || c.id;
   document.getElementById('compraData').value = c.data||'';
+  document.getElementById('compraNF').value = c.nf||'';
+  document.getElementById('compraObs').value = c.obs||'';
   const fOpts = db.fornecedores.map(f=>`<option value="${f.id}" ${f.id==c.fornId?'selected':''}>${f.nome}</option>`).join('');
   document.getElementById('compraFornecedor').innerHTML = '<option value="">Selecione...</option>' + fOpts;
-  document.getElementById('compraTipo').value = c.tipo||'mp';
-  renderCompraItemSelect();
-  document.getElementById('compraItem').value = c.itemId;
-  document.getElementById('compraQtd').value = c.qtd;
-  document.getElementById('compraCustoUnit').value = c.custoUnit;
-  calcTotalCompra();
-  document.getElementById('compraObs').value = c.obs||'';
   document.getElementById('modalCompraTitle').textContent = 'Editar Compra';
+
+  // Load all items of this group
+  document.getElementById('compraItensContainer').innerHTML = '';
+  compraItemCounter = 0;
+  const grupoId = c.compraGrupoId || c.id;
+  const grupoItens = db.compras.filter(x=>(x.compraGrupoId||x.id)==grupoId);
+  grupoItens.forEach(item => {
+    addCompraItem();
+    const cid = compraItemCounter - 1;
+    const tipoVal = item.tipo + '_' + item.itemId;
+    const selEl = document.getElementById('cTipo_'+cid);
+    if (selEl) selEl.value = tipoVal;
+    const qtdEl = document.getElementById('cQtd_'+cid);
+    if (qtdEl) qtdEl.value = item.qtd;
+    const custoEl = document.getElementById('cCusto_'+cid);
+    if (custoEl) custoEl.value = item.custoUnit;
+    calcCompraItemTotal(cid);
+  });
+
   openModal('modalCompra');
 }
 
 function delCompra(id) {
   if (!confirm('Excluir esta compra?')) return;
   const c = db.compras.find(x=>x.id==id);
-  db.compras = db.compras.filter(x=>x.id!=id);
-  if (c) atualizarCustoMedio(c.tipo, c.itemId);
+  if (!c) return;
+  const grupoId = c.compraGrupoId || c.id;
+  const grupoItens = db.compras.filter(x=>(x.compraGrupoId||x.id)==grupoId);
+  if (grupoItens.length > 1) {
+    if (!confirm(`Esta compra tem ${grupoItens.length} itens. Excluir todos?`)) return;
+    db.compras = db.compras.filter(x=>(x.compraGrupoId||x.id)!=grupoId);
+  } else {
+    db.compras = db.compras.filter(x=>x.id!=id);
+  }
+  grupoItens.forEach(it => atualizarCustoMedio(it.tipo, it.itemId));
   save(); renderCompras();
 }
 
@@ -3101,20 +3760,58 @@ function renderCompras() {
   const tb = document.getElementById('comprasTable');
   if (!tb) return;
   const sorted = [...db.compras].sort((a,b)=>b.data>a.data?1:-1);
-  tb.innerHTML = sorted.map(c=>`
-    <tr>
-      <td>${fmtDate(c.data)}</td>
-      <td>${c.fornNome||'-'}</td>
-      <td><span class="tag">${c.tipo==='mp'?'MP':'Insumo'}</span> ${c.itemNome}</td>
-      <td>${c.qtd} ${c.itemUnidade}</td>
-      <td>${fmt(c.custoUnit)}</td>
-      <td><span class="price">${fmt(c.total)}</span></td>
-      <td>
-        <button class="btn btn-secondary btn-sm" onclick="editCompra(${c.id})">✏️</button>
-        <button class="btn btn-danger btn-sm" onclick="delCompra(${c.id})">🗑️</button>
-      </td>
-    </tr>
-  `).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--gray-400);padding:32px">Nenhuma compra registrada</td></tr>';
+
+  // Group by compraGrupoId for display
+  const seen = new Set();
+  let rows = '';
+  sorted.forEach(c => {
+    const grupoId = c.compraGrupoId || c.id;
+    const grupoItens = db.compras.filter(x=>(x.compraGrupoId||x.id)==grupoId);
+    const isFirst = !seen.has(grupoId);
+    seen.add(grupoId);
+
+    if (isFirst && grupoItens.length > 1) {
+      // Multi-item group header
+      const totalGrupo = grupoItens.reduce((a,x)=>a+x.total,0);
+      rows += `<tr style="background:var(--verde-pale)">
+        <td>${fmtDate(c.data)}</td>
+        <td>${c.fornNome||'-'}</td>
+        <td><strong>${grupoItens.length} itens</strong>${c.nf?`<br><span class="text-sm">NF: ${c.nf}</span>`:''}</td>
+        <td>-</td><td>-</td>
+        <td><span class="price">${fmt(totalGrupo)}</span></td>
+        <td>
+          <button class="btn btn-secondary btn-sm" onclick="editCompra(${c.id})">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="delCompra(${c.id})">🗑️</button>
+        </td>
+      </tr>`;
+      grupoItens.forEach(it => {
+        rows += `<tr style="background:var(--gray-50)">
+          <td style="padding-left:24px;color:var(--gray-400);font-size:12px">↳</td>
+          <td></td>
+          <td><span class="tag">${it.tipo==='mp'?'MP':'Insumo'}</span> ${it.itemNome}</td>
+          <td>${it.qtd} ${it.itemUnidade}</td>
+          <td>${fmt(it.custoUnit)}</td>
+          <td><span style="color:var(--verde-dark);font-weight:500">${fmt(it.total)}</span></td>
+          <td></td>
+        </tr>`;
+      });
+    } else if (grupoItens.length === 1) {
+      rows += `<tr>
+        <td>${fmtDate(c.data)}</td>
+        <td>${c.fornNome||'-'}${c.nf?`<br><span class="text-sm">NF: ${c.nf}</span>`:''}</td>
+        <td><span class="tag">${c.tipo==='mp'?'MP':'Insumo'}</span> ${c.itemNome}</td>
+        <td>${c.qtd} ${c.itemUnidade}</td>
+        <td>${fmt(c.custoUnit)}</td>
+        <td><span class="price">${fmt(c.total)}</span></td>
+        <td>
+          <button class="btn btn-secondary btn-sm" onclick="editCompra(${c.id})">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="delCompra(${c.id})">🗑️</button>
+        </td>
+      </tr>`;
+    }
+  });
+
+  tb.innerHTML = rows || '<tr><td colspan="7" style="text-align:center;color:var(--gray-400);padding:32px">Nenhuma compra registrada</td></tr>';
 }
 
 // ============================================================
@@ -3179,11 +3876,56 @@ function matchFiltroData(dataStr, dia, mes, ano) {
   return true;
 }
 
+// Returns true if dataStr is STRICTLY BEFORE the filter period (for saldo inicial)
+function isBeforeFilterPeriod(dataStr, filtDia, filtMes, filtAno) {
+  if (!dataStr) return false;
+  // If no filter at all, nothing is "before" (no period start)
+  if (!filtDia && !filtMes && !filtAno) return false;
+
+  const y = dataStr.slice(0,4);
+  const m = dataStr.slice(5,7);
+  const d = dataStr.slice(8,10);
+
+  // Determine the start date of the filter period
+  const periodY = filtAno ? String(filtAno) : null;
+  const periodM = filtMes || null;
+  const periodD = filtDia ? String(parseInt(filtDia)).padStart(2,'0') : null;
+
+  // Compare year first
+  if (periodY) {
+    if (y < periodY) return true;
+    if (y > periodY) return false;
+    // same year: compare month
+    if (periodM) {
+      if (m < periodM) return true;
+      if (m > periodM) return false;
+      // same month: compare day
+      if (periodD) {
+        return d < periodD;
+      }
+      return false; // same year/month, no day filter → not before
+    }
+    return false; // same year, no month filter
+  }
+
+  // No year filter, but has month filter
+  if (periodM) {
+    if (m < periodM) return true;
+    if (m > periodM) return false;
+    if (periodD) return d < periodD;
+    return false;
+  }
+
+  // Only day filter — can't determine "before" without month/year context
+  return false;
+}
+
 function renderEstoque() {
   const filtProd = document.getElementById('estFiltProduto')?.value||'';
   const filtDia = document.getElementById('estFiltDia')?.value||'';
   const filtMes = document.getElementById('estFiltMes')?.value||'';
   const filtAno = document.getElementById('estFiltAno')?.value||'';
+  const isVal = estoqueViewMode === 'val';
 
   // Movimentações: compras filtradas
   let movs = [];
@@ -3193,11 +3935,11 @@ function renderEstoque() {
     if (!matchFiltroData(c.data, filtDia, filtMes, filtAno)) return;
     movs.push({ data:c.data, tipo:'Compra', tipoItem:c.tipo, itemId:c.itemId, itemNome:c.itemNome, fornNome:c.fornNome, qtd:c.qtd, custoUnit:c.custoUnit, total:c.total });
   });
-
   movs.sort((a,b)=>a.data>b.data?-1:1);
 
-  // Saldo por item (sem filtro de data para calcular saldo real)
+  // Saldo por item
   const saldoMap = {};
+  const custoMedioMap = {};
   const itensSet = new Set();
   db.mp.forEach(x=>itensSet.add(`mp_${x.id}`));
   db.insumos.forEach(x=>itensSet.add(`ins_${x.id}`));
@@ -3205,23 +3947,46 @@ function renderEstoque() {
     const [tipo, idStr] = chave.split('_');
     const itemId = parseInt(idStr);
     saldoMap[chave] = getEstoqueAtual(tipo, itemId);
+    custoMedioMap[chave] = getCustoMedioItem(tipo, itemId);
   });
 
   const tb = document.getElementById('estoqueTable');
+  // Update table headers
+  const thead = tb?.closest('table')?.querySelector('thead tr');
+  if (thead) {
+    if (isVal) {
+      thead.innerHTML = '<th>Data</th><th>Tipo</th><th>Produto/Material</th><th>Fornecedor</th><th>Valor Total</th><th>Saldo em Valor</th>';
+    } else {
+      thead.innerHTML = '<th>Data</th><th>Tipo</th><th>Produto/Material</th><th>Fornecedor</th><th>Qtd</th><th>Custo Unit.</th><th>Total</th><th>Saldo Total Atual</th>';
+    }
+  }
+
   if (tb) {
     tb.innerHTML = movs.map(m => {
       const chave = `${m.tipoItem}_${m.itemId}`;
       const saldo = saldoMap[chave]||0;
-      return `<tr>
-        <td>${fmtDate(m.data)}</td>
-        <td><span class="badge badge-success">${m.tipo}</span></td>
-        <td><span class="tag">${m.tipoItem==='mp'?'MP':'Ins'}</span> ${m.itemNome}</td>
-        <td>${m.fornNome||'-'}</td>
-        <td>${m.qtd}</td>
-        <td>${fmt(m.custoUnit)}</td>
-        <td>${fmt(m.total)}</td>
-        <td><strong style="color:${saldo<0?'var(--danger)':'var(--verde-dark)'}">${saldo.toFixed(2)}</strong></td>
-      </tr>`;
+      const cm = custoMedioMap[chave]||0;
+      if (isVal) {
+        return `<tr>
+          <td>${fmtDate(m.data)}</td>
+          <td><span class="badge badge-success">${m.tipo}</span></td>
+          <td><span class="tag">${m.tipoItem==='mp'?'MP':'Ins'}</span> ${m.itemNome}</td>
+          <td>${m.fornNome||'-'}</td>
+          <td><span class="price">${fmt(m.total)}</span></td>
+          <td><strong style="color:${saldo*cm<0?'var(--danger)':'var(--verde-dark)'}">${fmt(saldo*cm)}</strong></td>
+        </tr>`;
+      } else {
+        return `<tr>
+          <td>${fmtDate(m.data)}</td>
+          <td><span class="badge badge-success">${m.tipo}</span></td>
+          <td><span class="tag">${m.tipoItem==='mp'?'MP':'Ins'}</span> ${m.itemNome}</td>
+          <td>${m.fornNome||'-'}</td>
+          <td>${m.qtd}</td>
+          <td>${fmt(m.custoUnit)}</td>
+          <td>${fmt(m.total)}</td>
+          <td><strong style="color:${saldo<0?'var(--danger)':'var(--verde-dark)'}">${saldo.toFixed(2)}</strong></td>
+        </tr>`;
+      }
     }).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--gray-400);padding:24px">Nenhuma movimentação no período</td></tr>';
   }
 
@@ -3239,7 +4004,7 @@ function renderEstoque() {
       <tr>
         <td>${fmtDate(d.data)}</td>
         <td><span class="tag">${d.tipo==='mp'?'MP':'Ins'}</span> ${d.itemNome}</td>
-        <td>${d.qtd}</td>
+        <td>${isVal ? '-' : d.qtd}</td>
         <td>${fmt(d.custoMedioUnit)}</td>
         <td><span style="color:var(--danger);font-weight:600">${fmt(d.total)}</span></td>
         <td>${d.motivo||'-'}</td>
@@ -3261,6 +4026,8 @@ function renderEstoque() {
       <div class="stat-card" style="border-left:3px solid var(--info)"><div class="stat-label">Saldo em Estoque</div><div class="stat-value">${fmt(totalComprasValor-totalDescartesValor-consumoTotal)}</div><div class="stat-sub">valor estimado em estoque</div></div>
     `;
   }
+
+  renderEstoqueSaldoPorProduto(filtProd, filtDia, filtMes, filtAno);
 }
 
 function calcConsumoTotalCusto() {
@@ -3396,19 +4163,21 @@ function renderFluxoCaixa() {
   });
 
   const totalReceitas = receitas.reduce((a,p)=>a+p.valor,0);
+  const totalEntregas = receitas.reduce((a,p)=>a+(parseFloat(p.valorEntrega)||0),0);
   const totalDescartes = descPeriodo.reduce((a,d)=>a+d.total,0);
   const totalConsumo = consumos.reduce((a,c)=>a+c.total,0);
   const totalCustos = totalDescartes + totalConsumo;
-  const saldo = totalReceitas - totalCustos;
+  const saldo = totalReceitas + totalEntregas - totalCustos;
 
   // Cards
   const statsEl = document.getElementById('fcStats');
   if (statsEl) {
     statsEl.innerHTML = `
       <div class="stat-card" style="border-left:3px solid var(--verde)"><div class="stat-label">Total Receitas</div><div class="stat-value">${fmt(totalReceitas)}</div><div class="stat-sub">${receitas.length} pedidos concluídos</div></div>
+      <div class="stat-card" style="border-left:3px solid var(--info)"><div class="stat-label">Rec. de Entrega</div><div class="stat-value">${fmt(totalEntregas)}</div><div class="stat-sub">frete motoboy / endereço</div></div>
       <div class="stat-card" style="border-left:3px solid var(--danger)"><div class="stat-label">Total Custos</div><div class="stat-value">${fmt(totalCustos)}</div><div class="stat-sub">descartes + consumo materiais</div></div>
       <div class="stat-card" style="border-left:3px solid var(--warning)"><div class="stat-label">Descarte</div><div class="stat-value">${fmt(totalDescartes)}</div><div class="stat-sub">custo materiais descartados</div></div>
-      <div class="stat-card" style="border-left:3px solid ${saldo>=0?'var(--success)':'var(--danger)'}"><div class="stat-label">Saldo Período</div><div class="stat-value" style="color:${saldo>=0?'var(--success)':'var(--danger)'}">${fmt(saldo)}</div><div class="stat-sub">receita - custos</div></div>
+      <div class="stat-card" style="border-left:3px solid ${saldo>=0?'var(--success)':'var(--danger)'}"><div class="stat-label">Saldo Período</div><div class="stat-value" style="color:${saldo>=0?'var(--success)':'var(--danger)'}">${fmt(saldo)}</div><div class="stat-sub">receita + frete - custos</div></div>
     `;
   }
 
@@ -3421,8 +4190,9 @@ function renderFluxoCaixa() {
         <td><span class="badge badge-gray">#${p.numero||p.id}</span></td>
         <td>${p.produtoNome}</td>
         <td><span style="color:var(--verde-dark);font-weight:600">${fmt(p.valor)}</span></td>
+        <td>${p.valorEntrega?`<span style="color:var(--info);font-weight:500">${fmt(p.valorEntrega)}</span>`:'-'}</td>
       </tr>
-    `).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--gray-400);padding:24px">Nenhuma receita no período</td></tr>';
+    `).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--gray-400);padding:24px">Nenhuma receita no período</td></tr>';
   }
 
   // Tabela custos (descartes + consumo)
@@ -3484,10 +4254,458 @@ function renderFluxoCaixa() {
   }
 }
 
+// ============================================================
+//  ENTREGA TIPO CHANGE
+// ============================================================
+function onEntregaTipoChange() {
+  const tipo = document.getElementById('pedEntregaTipo')?.value||'';
+  const grp = document.getElementById('pedValorEntregaGrp');
+  if (grp) grp.style.display = (tipo === 'Motoboy' || tipo === 'Entrega no endereço') ? 'block' : 'none';
+}
+
+// ============================================================
+//  CUSTO HORA - CRUD
+// ============================================================
+function getCustoHoraVigente() {
+  if (!db.custoHora || db.custoHora.length === 0) return 0;
+  const hoje = today();
+  // find vigencia that covers today
+  const vig = db.custoHora.find(c => c.de <= hoje && (!c.ate || c.ate >= hoje));
+  if (vig) return parseFloat(vig.valor)||0;
+  // fallback: most recent
+  const sorted = [...db.custoHora].sort((a,b)=>b.de>a.de?1:-1);
+  return parseFloat(sorted[0]?.valor)||0;
+}
+
+function openNovoCustoHora() {
+  document.getElementById('chId').value = '';
+  document.getElementById('chDe').value = today();
+  document.getElementById('chAte').value = '';
+  document.getElementById('chValor').value = '';
+  document.getElementById('chDesc').value = '';
+  document.getElementById('modalCustoHoraTitle').textContent = 'Nova Vigência de Custo/Hora';
+  openModal('modalCustoHora');
+}
+
+function saveCustoHora() {
+  const id = document.getElementById('chId').value;
+  const de = document.getElementById('chDe').value;
+  const ate = document.getElementById('chAte').value;
+  const valor = parseFloat(document.getElementById('chValor').value)||0;
+  const desc = document.getElementById('chDesc').value;
+
+  if (!de) { alert('Informe a data de início da vigência'); return; }
+  if (valor <= 0) { alert('Informe o valor do custo/hora'); return; }
+
+  const obj = { id: id || (nextId.ch++), de, ate, valor, desc };
+  if (id) { const i = db.custoHora.findIndex(x=>x.id==id); db.custoHora[i]=obj; }
+  else db.custoHora.push(obj);
+  save(); closeModal('modalCustoHora'); renderCustoHora();
+}
+
+function editCustoHora(id) {
+  const c = db.custoHora.find(x=>x.id==id);
+  document.getElementById('chId').value = c.id;
+  document.getElementById('chDe').value = c.de||'';
+  document.getElementById('chAte').value = c.ate||'';
+  document.getElementById('chValor').value = c.valor||'';
+  document.getElementById('chDesc').value = c.desc||'';
+  document.getElementById('modalCustoHoraTitle').textContent = 'Editar Vigência';
+  openModal('modalCustoHora');
+}
+
+function delCustoHora(id) {
+  if (!confirm('Excluir esta vigência?')) return;
+  db.custoHora = db.custoHora.filter(x=>x.id!=id);
+  save(); renderCustoHora();
+}
+
+function renderCustoHora() {
+  const tb = document.getElementById('custoHoraTable');
+  if (!tb) return;
+  const hoje = today();
+  const sorted = [...(db.custoHora||[])].sort((a,b)=>b.de>a.de?1:-1);
+  tb.innerHTML = sorted.map(c => {
+    const ativo = c.de <= hoje && (!c.ate || c.ate >= hoje);
+    return `<tr>
+      <td>${fmtDate(c.de)}</td>
+      <td>${c.ate ? fmtDate(c.ate) : '<span style="color:var(--gray-400)">Em aberto</span>'}</td>
+      <td><span class="price">${fmt(c.valor)}/h</span></td>
+      <td>${c.desc||'-'}</td>
+      <td><span class="badge ${ativo?'badge-success':'badge-gray'}">${ativo?'✅ Vigente':'Inativo'}</span></td>
+      <td>
+        <button class="btn btn-secondary btn-sm" onclick="editCustoHora(${c.id})">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="delCustoHora(${c.id})">🗑️</button>
+      </td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--gray-400);padding:32px">Nenhuma vigência cadastrada</td></tr>';
+}
+
+// ============================================================
+//  ESTOQUE - VIEW TOGGLE (QTD / VALOR)
+// ============================================================
+let estoqueViewMode = 'qtd'; // 'qtd' or 'val'
+
+function setEstoqueView(mode) {
+  estoqueViewMode = mode;
+  document.getElementById('estViewQtd').classList.toggle('active', mode === 'qtd');
+  document.getElementById('estViewVal').classList.toggle('active', mode === 'val');
+  renderEstoque();
+}
+
+// ============================================================
+//  ESTOQUE - GERAR PDF
+// ============================================================
+function gerarEstoquePDF() {
+  const filtProd = document.getElementById('estFiltProduto')?.value||'';
+  const filtDia = document.getElementById('estFiltDia')?.value||'';
+  const filtMes = document.getElementById('estFiltMes')?.value||'';
+  const filtAno = document.getElementById('estFiltAno')?.value||'';
+  const dataHoje = fmtDate(today());
+  const isVal = estoqueViewMode === 'val';
+
+  // Saldo por produto table
+  const itens = [];
+  db.mp.forEach(x => itens.push({ tipo:'mp', id:x.id, nome:x.nome, unidade:x.unidade||'un' }));
+  db.insumos.forEach(x => itens.push({ tipo:'ins', id:x.id, nome:x.nome, unidade:x.unidade||'un' }));
+
+  const filteredItens = itens.filter(it => !filtProd || filtProd === `${it.tipo}_${it.id}`);
+
+  const saldoRows = filteredItens.map(it => {
+    const comprasItem = db.compras.filter(c=>c.tipo===it.tipo && c.itemId==it.id);
+    const descartesItem = db.descartes.filter(d=>d.tipo===it.tipo && d.itemId==it.id);
+    const comprasFilt = comprasItem.filter(c=>matchFiltroData(c.data, filtDia, filtMes, filtAno));
+    const qtdCompras = comprasFilt.reduce((a,c)=>a+c.qtd,0);
+    const valCompras = comprasFilt.reduce((a,c)=>a+c.total,0);
+    let qtdVendas=0;
+    db.concluidos.filter(p=>matchFiltroData(p.dataConclusao||'',filtDia,filtMes,filtAno)).forEach(p=>{
+      const pa=db.prodacabado.find(x=>x.id==p.produtoId); if(!pa||!pa.itens)return;
+      pa.itens.forEach(i=>{if(i.type===it.tipo&&i.itemId==it.id)qtdVendas+=(i.qtd||0);});
+    });
+    const descFilt = descartesItem.filter(d=>matchFiltroData(d.data,filtDia,filtMes,filtAno));
+    const qtdDesc = descFilt.reduce((a,d)=>a+d.qtd,0);
+    const valDesc = descFilt.reduce((a,d)=>a+d.total,0);
+    const comprasAntes = comprasItem.filter(c=>isBeforeFilterPeriod(c.data,filtDia,filtMes,filtAno));
+    const saldoInicial = comprasAntes.reduce((a,c)=>a+c.qtd,0);
+    const saldoReal = getEstoqueAtual(it.tipo, it.id);
+    const cm = getCustoMedioItem(it.tipo, it.id);
+    const valSaldo = saldoReal * cm;
+
+    if (isVal) {
+      return `<tr>
+        <td><strong>${it.nome}</strong></td>
+        <td>${it.tipo==='mp'?'MP':'Insumo'}</td>
+        <td style="text-align:right">R$ ${(saldoInicial*cm).toFixed(2)}</td>
+        <td style="text-align:right;color:#27ae60">+R$ ${valCompras.toFixed(2)}</td>
+        <td style="text-align:right;color:#2980b9">-R$ ${(qtdVendas*cm).toFixed(2)}</td>
+        <td style="text-align:right;color:#c0392b">-R$ ${valDesc.toFixed(2)}</td>
+        <td style="text-align:right;font-weight:700;color:${valSaldo<0?'#c0392b':'#364540'}">R$ ${valSaldo.toFixed(2)}</td>
+      </tr>`;
+    } else {
+      return `<tr>
+        <td><strong>${it.nome}</strong></td>
+        <td>${it.tipo==='mp'?'MP':'Insumo'}</td>
+        <td>${it.unidade}</td>
+        <td style="text-align:right">${saldoInicial.toFixed(2)}</td>
+        <td style="text-align:right;color:#27ae60">+${qtdCompras.toFixed(2)}</td>
+        <td style="text-align:right;color:#2980b9">-${qtdVendas.toFixed(2)}</td>
+        <td style="text-align:right;color:#c0392b">-${qtdDesc.toFixed(2)}</td>
+        <td style="text-align:right;font-weight:700;color:${saldoReal<0?'#c0392b':'#364540'}">${saldoReal.toFixed(2)}</td>
+      </tr>`;
+    }
+  }).join('') || '<tr><td colspan="8" style="text-align:center;color:#999;padding:16px">Nenhum produto</td></tr>';
+
+  const saldoHeader = isVal
+    ? '<th>Produto</th><th>Tipo</th><th>Saldo Inicial (R$)</th><th>Entradas (R$)</th><th>Saídas (R$)</th><th>Descartes (R$)</th><th>Saldo Final (R$)</th>'
+    : '<th>Produto</th><th>Tipo</th><th>Unidade</th><th>Saldo Inicial</th><th>Entradas</th><th>Saídas</th><th>Descartes</th><th>Saldo Final</th>';
+
+  // Stats
+  const totalComprasValor = db.compras.reduce((a,c)=>a+c.total,0);
+  const totalDescValor = db.descartes.reduce((a,d)=>a+d.total,0);
+  const consumoTotal = calcConsumoTotalCusto();
+
+  document.getElementById('estoquePrint').innerHTML = `
+    <div class="ep-header">
+      <div>
+        <h2>🌸 Planeta Flores — Estoque</h2>
+        <p>Emitido em: ${dataHoje} | Visualização: ${isVal?'Valor (R$)':'Quantidade'}</p>
+      </div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-box"><div class="label">Total Comprado</div><div class="val">R$ ${totalComprasValor.toFixed(2)}</div></div>
+      <div class="stat-box"><div class="label">Total Descartado</div><div class="val">R$ ${totalDescValor.toFixed(2)}</div></div>
+      <div class="stat-box"><div class="label">Total Consumido</div><div class="val">R$ ${consumoTotal.toFixed(2)}</div></div>
+      <div class="stat-box"><div class="label">Saldo em Estoque</div><div class="val">R$ ${(totalComprasValor-totalDescValor-consumoTotal).toFixed(2)}</div></div>
+    </div>
+    <h3>Saldo por Produto/Material</h3>
+    <table>
+      <thead><tr>${saldoHeader}</tr></thead>
+      <tbody>${saldoRows}</tbody>
+    </table>
+    <div class="ep-footer">Planeta Flores • Relatório de Estoque • ${dataHoje}</div>
+  `;
+  document.body.classList.add('print-estoque');
+  window.print();
+  setTimeout(()=>document.body.classList.remove('print-estoque'), 1000);
+}
+
+// ============================================================
+//  IMPRIMIR TABELA DE PREÇOS (sem custo/markup)
+// ============================================================
+function imprimirTabPrecos() {
+  const dataHoje = fmtDate(today());
+  const rows = db.prodacabado.map((p) => `
+    <tr>
+      <td style="text-align:center;color:#666">#${String(p.id).padStart(3,'0')}</td>
+      <td><strong>${p.nome}</strong>${p.desc?`<br><span style="font-size:11px;color:#888">${p.desc}</span>`:''}</td>
+      <td>${p.categoria}</td>
+      <td style="text-align:right;font-weight:700;color:#364540;font-size:15px">R$ ${p.precoVenda.toFixed(2)}</td>
+    </tr>
+  `).join('') || '<tr><td colspan="4" style="text-align:center;color:#999;padding:24px">Nenhum produto cadastrado</td></tr>';
+
+  document.getElementById('tabPrecosPrint').innerHTML = `
+    <div class="tp-header">
+      <div class="tp-header-left">
+        <img src="data:image/png;base64,${LOGO_B64}" alt="Planeta Flores">
+        <div>
+          <h2>Planeta Flores</h2>
+          <p>Floricultura • Desde 2003</p>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <strong style="font-size:20px;color:#364540">TABELA DE PREÇOS</strong><br>
+        <span style="font-size:12px;color:#888">Emitida em: ${dataHoje}</span>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:60px">Código</th>
+          <th>Produto</th>
+          <th style="width:110px">Categoria</th>
+          <th style="width:130px;text-align:right">Preço de Venda</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="tp-footer">Tabela de Preços — Planeta Flores • ${dataHoje} • ${db.prodacabado.length} produto(s)</div>
+  `;
+  document.body.classList.add('print-tabprecos');
+  window.print();
+  setTimeout(()=>document.body.classList.remove('print-tabprecos'), 1000);
+}
+
+// ============================================================
+//  ESTOQUE - SALDO POR PRODUTO
+// ============================================================
+function renderEstoqueSaldoPorProduto(filtProd, filtDia, filtMes, filtAno) {
+  const tb = document.getElementById('estoqueSaldoTable');
+  if (!tb) return;
+  const isVal = estoqueViewMode === 'val';
+
+  // Update saldo table header
+  const thead = tb.closest('table')?.querySelector('thead tr');
+  if (thead) {
+    if (isVal) {
+      thead.innerHTML = '<th>Produto/Material</th><th>Tipo</th><th>Saldo Inicial (R$)</th><th>Entradas (R$)</th><th>Saídas (R$)</th><th>Descartes (R$)</th><th>Saldo Final (R$)</th>';
+    } else {
+      thead.innerHTML = '<th>Produto/Material</th><th>Tipo</th><th>Unidade</th><th>Saldo Inicial</th><th>Entradas (Compras)</th><th>Saídas (Vendas)</th><th>Descartes</th><th>Saldo Final</th>';
+    }
+  }
+
+  const itens = [];
+  db.mp.forEach(x => itens.push({ tipo:'mp', id:x.id, nome:x.nome, unidade:x.unidade||'un' }));
+  db.insumos.forEach(x => itens.push({ tipo:'ins', id:x.id, nome:x.nome, unidade:x.unidade||'un' }));
+
+  const rows = itens.filter(it => {
+    if (!filtProd) return true;
+    return filtProd === `${it.tipo}_${it.id}`;
+  }).map(it => {
+    const comprasItem = db.compras.filter(c=>c.tipo===it.tipo && c.itemId==it.id);
+    const descartesItem = db.descartes.filter(d=>d.tipo===it.tipo && d.itemId==it.id);
+    const comprasFilt = comprasItem.filter(c=>matchFiltroData(c.data, filtDia, filtMes, filtAno));
+    const qtdCompras = comprasFilt.reduce((a,c)=>a+c.qtd,0);
+    const valCompras = comprasFilt.reduce((a,c)=>a+c.total,0);
+
+    let qtdVendas = 0;
+    db.concluidos.filter(p => matchFiltroData(p.dataConclusao||'', filtDia, filtMes, filtAno)).forEach(p => {
+      const pa = db.prodacabado.find(x=>x.id==p.produtoId);
+      if (!pa || !pa.itens) return;
+      pa.itens.forEach(i => { if (i.type===it.tipo && i.itemId==it.id) qtdVendas += (i.qtd||0); });
+    });
+
+    const descFilt = descartesItem.filter(d=>matchFiltroData(d.data, filtDia, filtMes, filtAno));
+    const qtdDescartes = descFilt.reduce((a,d)=>a+d.qtd,0);
+    const valDescartes = descFilt.reduce((a,d)=>a+d.total,0);
+    const comprasAntes = comprasItem.filter(c => isBeforeFilterPeriod(c.data, filtDia, filtMes, filtAno));
+    const qtdAntes = comprasAntes.reduce((a,c)=>a+c.qtd,0);
+    const cm = getCustoMedioItem(it.tipo, it.id);
+    const valSaldoInicial = qtdAntes * cm;
+
+    // Saldo final: if a period filter is active, calculate from the period; otherwise use global real balance
+    const hasFilter = !!(filtDia || filtMes || filtAno);
+    const saldoFinalQtd = hasFilter
+      ? qtdAntes + qtdCompras - qtdVendas - qtdDescartes
+      : getEstoqueAtual(it.tipo, it.id);
+    const valSaldoFinal = saldoFinalQtd * cm;
+
+    if (isVal) {
+      return `<tr>
+        <td><strong>${it.nome}</strong></td>
+        <td><span class="tag">${it.tipo==='mp'?'MP':'Insumo'}</span></td>
+        <td style="text-align:right">${fmt(valSaldoInicial)}</td>
+        <td style="text-align:right;color:var(--success)">+${fmt(valCompras)}</td>
+        <td style="text-align:right;color:var(--info)">-${fmt(qtdVendas*cm)}</td>
+        <td style="text-align:right;color:var(--danger)">-${fmt(valDescartes)}</td>
+        <td style="text-align:right"><strong style="color:${valSaldoFinal<0?'var(--danger)':'var(--verde-dark)'}">${fmt(valSaldoFinal)}</strong></td>
+      </tr>`;
+    } else {
+      return `<tr>
+        <td><strong>${it.nome}</strong></td>
+        <td><span class="tag">${it.tipo==='mp'?'MP':'Insumo'}</span></td>
+        <td>${it.unidade}</td>
+        <td style="text-align:right">${qtdAntes.toFixed(2)}</td>
+        <td style="text-align:right;color:var(--success)">+${qtdCompras.toFixed(2)}</td>
+        <td style="text-align:right;color:var(--info)">-${qtdVendas.toFixed(2)}</td>
+        <td style="text-align:right;color:var(--danger)">-${qtdDescartes.toFixed(2)}</td>
+        <td style="text-align:right"><strong style="color:${saldoFinalQtd<0?'var(--danger)':'var(--verde-dark)'}">${saldoFinalQtd.toFixed(2)}</strong></td>
+      </tr>`;
+    }
+  }).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--gray-400);padding:24px">Nenhum produto cadastrado</td></tr>';
+
+  tb.innerHTML = rows;
+}
+
+// ============================================================
+//  CATEGORIAS
+// ============================================================
+const CAT_TIPO_LABELS = { mp: 'Matéria-Prima', ins: 'Insumos / Embalagens', pa: 'Produtos Acabados' };
+
+function openNovaCategoria(tipo) {
+  document.getElementById('catId').value = '';
+  document.getElementById('catTipo').value = tipo || 'mp';
+  document.getElementById('catTipoDisplay').value = CAT_TIPO_LABELS[tipo || 'mp'];
+  document.getElementById('catNome').value = '';
+  document.getElementById('modalCategoriaTitle').textContent = 'Nova Categoria — ' + CAT_TIPO_LABELS[tipo || 'mp'];
+  openModal('modalCategoria');
+}
+
+function saveCategoria() {
+  const tipo = document.getElementById('catTipo').value;
+  const nome = document.getElementById('catNome').value.trim();
+  const id = document.getElementById('catId').value;
+
+  if (!nome) { alert('Informe o nome da categoria'); return; }
+  if (!db.categorias[tipo]) db.categorias[tipo] = [];
+
+  if (id !== '') {
+    // Edit: id is the index
+    db.categorias[tipo][parseInt(id)] = nome;
+  } else {
+    if (db.categorias[tipo].includes(nome)) { alert('Categoria já existe'); return; }
+    db.categorias[tipo].push(nome);
+  }
+
+  save(); closeModal('modalCategoria'); renderCategorias();
+  // Update selects in open modals
+  refreshCategoriaSelects();
+}
+
+function editCategoria(tipo, idx) {
+  const nome = db.categorias[tipo][idx];
+  document.getElementById('catId').value = idx;
+  document.getElementById('catTipo').value = tipo;
+  document.getElementById('catTipoDisplay').value = CAT_TIPO_LABELS[tipo];
+  document.getElementById('catNome').value = nome;
+  document.getElementById('modalCategoriaTitle').textContent = 'Editar Categoria';
+  openModal('modalCategoria');
+}
+
+function delCategoria(tipo, idx) {
+  if (!confirm('Excluir esta categoria?')) return;
+  db.categorias[tipo].splice(idx, 1);
+  save(); renderCategorias(); refreshCategoriaSelects();
+}
+
+function renderCategorias() {
+  const renderTable = (tipo, tbId) => {
+    const tb = document.getElementById(tbId);
+    if (!tb) return;
+    const cats = db.categorias[tipo] || [];
+    tb.innerHTML = cats.map((c, i) => `
+      <tr>
+        <td>${c}</td>
+        <td>
+          <button class="btn btn-secondary btn-sm" onclick="editCategoria('${tipo}',${i})">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="delCategoria('${tipo}',${i})">🗑️</button>
+        </td>
+      </tr>
+    `).join('') || '<tr><td colspan="2" style="text-align:center;color:var(--gray-400);padding:16px">Nenhuma categoria</td></tr>';
+  };
+  renderTable('mp', 'catMPTable');
+  renderTable('ins', 'catInsTable');
+  renderTable('pa', 'catPATable');
+}
+
+function refreshCategoriaSelects() {
+  // MP categories
+  const mpSel = document.getElementById('mpCategoria');
+  if (mpSel) {
+    const cur = mpSel.value;
+    mpSel.innerHTML = (db.categorias.mp || []).map(c => `<option${c===cur?' selected':''}>${c}</option>`).join('');
+  }
+  // Insumos categories
+  const insSel = document.getElementById('insCategoria');
+  if (insSel) {
+    const cur = insSel.value;
+    insSel.innerHTML = (db.categorias.ins || []).map(c => `<option${c===cur?' selected':''}>${c}</option>`).join('');
+  }
+  // Produtos Acabados categories
+  const paSel = document.getElementById('paCategoria');
+  if (paSel) {
+    const cur = paSel.value;
+    paSel.innerHTML = (db.categorias.pa || []).map(c => `<option${c===cur?' selected':''}>${c}</option>`).join('');
+  }
+}
+
+// ============================================================
+//  MOBILE SIDEBAR
+// ============================================================
+function toggleSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  const isOpen = sidebar.classList.contains('mobile-open');
+  if (isOpen) {
+    sidebar.classList.remove('mobile-open');
+    overlay.classList.remove('open');
+  } else {
+    sidebar.classList.add('mobile-open');
+    overlay.classList.add('open');
+  }
+}
+
+function closeSidebar() {
+  document.querySelector('.sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+}
+
+// Close sidebar on nav item click (mobile)
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      if (window.innerWidth <= 768) closeSidebar();
+    });
+  });
+});
+
 initApp();
 </script>
 <!-- ORÇAMENTO (IMPRESSÃO/PDF) -->
 <div id="orcamentoPrint"></div>
+<!-- TABELA PREÇOS (IMPRESSÃO) -->
+<div id="tabPrecosPrint"></div>
+<!-- ESTOQUE PDF -->
+<div id="estoquePrint"></div>
 
 </body>
 </html>
